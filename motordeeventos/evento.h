@@ -10,12 +10,13 @@ using namespace std;
 
 class evento
 {
-	evento * proximo;
-	int instante_programado;
-	char id;
-	string name;
-	(*tarefa)(void);
-	evento(evento * prox, int inst, char i, string n, tarefa(void));
+	public:
+		evento * proximo;
+		int instante_programado;
+		char id;
+		string name;
+		(*tarefa)(void);
+		evento(evento * prox, int inst, char i, string n, tarefa(void));
 };
 
 #endif
