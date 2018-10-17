@@ -1,5 +1,4 @@
-#include <iostream>
-using namespace std;
+#include <stdio.h>
 
 
 //public types
@@ -9,8 +8,9 @@ typedef struct
 	evento * proximo;
 	int instante_programado;
 	char id;
-	(*tarefa)(void);
+	//tarefa associada
+	
 } evento;
 
-
+//public methods
 
