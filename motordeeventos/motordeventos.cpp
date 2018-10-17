@@ -35,7 +35,7 @@ events_map.insert(pair<char, (*tarefa)(void)> ('4', close_file));
 events_map.insert(pair<char, (*tarefa)(void)> ('5', position_line));
 events_map.insert(pair<char, (*tarefa)(void)> ('6', next_line));
 events_map.insert(pair<char, (*tarefa)(void)> ('7', read_line));
-events_map.insert(pair<char, (*tarefa)(void)> ('8', end_process));
+events_map.insert(pair<char, (*tarefa)(void)> ('8', end_process));                                                                                                                                      
 
 //declaracao de tarefas
 
