@@ -8,8 +8,9 @@ Motor de Eventos Generico
 
 #include <iostream>
 using namespace std;
+#include "map"
 
-//lista-ligada de eventos
+//declaracao de eventos de interesse
 
 Evento * init = new Evento(NULL, 0, '1', "init process", init_process);
 Evento * current_file = new Evento(NULL, 0, '2', "current file", curr_proc);
@@ -20,7 +21,21 @@ Evento * next_line = new Evento(NULL, 0, '6', "position next line", next_line);
 Evento * read = new Evento(NULL, 0, '7', "read line", read_line);
 Evento * end = new Evento(NULL, 0, '6', "end of process", end_process);
 
+//lista ligada
+
+Evento * head = new Evento(NULL, 0, '0', "head of linked list", linked_list);
+
 //mapeamento de tarefas
+
+unordered_map <char, (*tarefa)(void)> events_map;
+events_map.insert(pair<char, (*tarefa)(void)> ('1', init_process));
+events_map.insert(pair<char, (*tarefa)(void)> ('2', curr_proc));
+events_map.insert(pair<char, (*tarefa)(void)> ('3', open_file));
+events_map.insert(pair<char, (*tarefa)(void)> ('4', close_file));
+events_map.insert(pair<char, (*tarefa)(void)> ('5', position_line));
+events_map.insert(pair<char, (*tarefa)(void)> ('6', next_line));
+events_map.insert(pair<char, (*tarefa)(void)> ('7', read_line));
+events_map.insert(pair<char, (*tarefa)(void)> ('8', end_process));
 
 //declaracao de tarefas
 
