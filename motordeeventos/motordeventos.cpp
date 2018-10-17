@@ -55,3 +55,42 @@ int main()
 }
 
 //definicao de tarefas
+void init_process(void)
+{
+
+}
+
+void curr_proc(void)
+{
+
+}
+
+void open_file(void)
+{
+
+}
+
+void close_file(void)
+{
+
+}
+
+void position_line(void)
+{
+
+}
+
+void next_line(void)
+{
+
+}
+
+void read_line(void)
+{
+
+}
+
+void end_process(void)
+{
+    
+}
