@@ -1,0 +1,35 @@
+init process
+Init compiler
+open file
+read lines
+extract ascii characters
+-compiladores
+-
+c
+o
+m
+p
+i
+l
+a
+d
+o
+r
+e
+s
+categorize ascii characters
+useful special
+useful letter
+useful letter
+useful letter
+useful letter
+useful letter
+useful letter
+useful letter
+useful letter
+useful letter
+useful letter
+useful letter
+useful letter
+close file
+13

@@ -1,5 +1,5 @@
-motordeventos: motordeventos.c evento.c evento.h
-	gcc motordeventos.c -lm -o motordeeventos
+copilador: compilador.cpp filesystem.cpp asciifilter.cpp asciicharacter.cpp token.cpp evento.cpp
+	g++ -o compilador compilador.cpp filesystem.cpp asciifilter.cpp asciicharacter.cpp token.cpp evento.cpp
 
 clean:
-	rm motordeeventos
+	rm -rf *.o
