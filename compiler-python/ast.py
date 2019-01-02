@@ -11,6 +11,22 @@ class Number():
         i = ir.Constant(ir.IntType(8), int(self.value))
         return i
 
+class Character():
+    def __init__(value):
+        self.value = value
+
+    def eval(self):
+        return 
+
+class Var():
+    def __init(self, builder, module, value):
+        self.builder = builder
+        self.module = module
+        self.value = value
+    
+    def eval(self):
+        global_v = GlobalVariable(self.module,value.type,name=self.id)
+
 
 class BinaryOp():
     def __init__(self, builder, module, left, right):
@@ -43,9 +59,16 @@ class Assign():
 
     def eval(self):
         global_v = GlobalVariable(self.module,value.type,name=self.id)
-        global_v.initializer = self.value
+        global_v.initializer = self.value        
         
-        
+class PrintItem():
+    def __init__(self, builder, module, item):
+        self.builder = builder
+        self.item = item #token
+    
+    def eval(self):
+        i = self.builder.load(self.item.value)
+        return ir.Constant(ir.IntType(8), int(i))
 
 class Print():
     def __init__(self, builder, module, printf, value):
@@ -60,8 +83,7 @@ class Print():
         # Declare argument list
         voidptr_ty = ir.IntType(8).as_pointer()
         fmt = "%i \n\0"
-        c_fmt = ir.Constant(ir.ArrayType(ir.IntType(8), len(fmt)),
-                            bytearray(fmt.encode("utf8")))
+        c_fmt = ir.Constant(ir.ArrayType(ir.IntType(8), len(fmt)),bytearray(fmt.encode("utf8")))
         global_fmt = ir.GlobalVariable(self.module, c_fmt.type, name="fstr")
         global_fmt.linkage = 'internal'
         global_fmt.global_constant = True

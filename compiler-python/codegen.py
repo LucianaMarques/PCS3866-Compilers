@@ -10,8 +10,7 @@ class CodeGen():
         self._config_llvm()
         self._create_execution_engine()
         self._declare_print_function()
-        # self._declare_variable(self,a)
-        # self._assign_value_to_variable(self,a, value)
+        #self._create_module_ref()
 
     def _config_llvm(self):
         # Config LLVM
@@ -21,6 +20,9 @@ class CodeGen():
         base_func = ir.Function(self.module, func_type, name="main")
         block = base_func.append_basic_block(name="entry")
         self.builder = ir.IRBuilder(block)
+
+    # def _create_module_ref(self):
+    #     self.module_ref = ModuleRef(self)
 
     def _create_execution_engine(self):
         """
@@ -40,14 +42,7 @@ class CodeGen():
         voidptr_ty = ir.IntType(8).as_pointer()
         printf_ty = ir.FunctionType(ir.IntType(32), [voidptr_ty], var_arg=True)
         printf = ir.Function(self.module, printf_ty, name="printf")
-        self.printf = printf
-
-    def _declare_int_variable(self,a):
-        # Create a variable
-        return ir.GlobalVariable(self.module,ir.IntType(32),a,0)
-
-    def _assign_value_to_variable(self,a, value):
-        a.initializer = value      
+        self.printf = printf    
 
 
     def _compile_ir(self):
