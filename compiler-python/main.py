@@ -100,8 +100,9 @@ def expression(tokens, j):
     '''NEEDS TO RETURN A NUMBER'''
     s = ""
 
+    # print(tokens[j].gettokentype())
     j, s = node_10(tokens, j)
-
+    print(tokens[j].gettokentype())
     # NODE 12   
     if (tokens[j].value == "("):
         #expression(tokens,j+1) # return to node 10
@@ -121,8 +122,7 @@ def node_10(tokens, j):
     elif (tokens[j].value == '-'):
         s = s + tokens[j].value
         j= j+1
-    elif (tokens[j].gettokentype == "INT"):
-        print(j)
+    elif (tokens[j].gettokentype() == "INT"):
         s = s + tokens[j].value
         j = j + 1
     return j, s
