@@ -53,7 +53,11 @@ class MotorDeEventos():
             self.add_event("extrair_tokens")
         elif (e.type == "extrair_tokens"):
             tokens2 = []
+            s = ""
             for token in self.tokens:
+                if (token.type == "letter"):
+                    #decidir se é identifier, character, composed ou reserved
+                    pass
                 
             
 
