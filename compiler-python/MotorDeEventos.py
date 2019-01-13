@@ -33,6 +33,7 @@ class MotorDeEventos():
             for each in e.value:
                 self.add_event(Evento("classificar_caracter",each))
         elif (e.type == "classificar_caracter"):
+            print("CLASSIFICAÇÃO DE CARACTERES")
             if (e.value == " "):
                 t = "descartavel"
             elif (e.value == '\n'):
@@ -42,6 +43,7 @@ class MotorDeEventos():
             self.tokens.append(Token(t,e.value))
             self.add_event(Evento("reclassificar_caracteres", self.tokens))
         elif(e.type == "reclassificar_caracteres"):
+            print("RECLASSIFICAÇÃO DE CARACTERES")
             for token in self.tokens:
                 if (token.type == "util"):
                     if (token.key >= '0' and token.key <= '9'):
@@ -50,8 +52,9 @@ class MotorDeEventos():
                         token.type = "letter"
                     else:
                         token.type = "special"
-            self.add_event("extrair_tokens")
+            self.add_event(Evento("extrair_tokens", self.tokens))
         elif (e.type == "extrair_tokens"):
+            print("EXTRAÇÃO DE TOKENS")
             tokens2 = []
             s = ""
             for token in self.tokens:
@@ -59,11 +62,7 @@ class MotorDeEventos():
                     #decidir se é identifier, character, composed ou reserved
                     pass
                 
-            
-
-
-
-    
+                
     def event_cycle(self):
         while (self.q.empty() == False):
             e = self.event_extraction()
