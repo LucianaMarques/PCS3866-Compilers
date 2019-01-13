@@ -1,4 +1,5 @@
 from queue import Queue
+from LexerCateg import AsciiCharacter, LexerCategorizer
 
 class MotorDeEventos():
     def __init__(self):
@@ -44,15 +45,9 @@ class MotorDeEventos():
             self.characters.append(AsciiCharacter(t,e.value))
             self.add_event(Evento("reclassificar_caracteres", self.tokens))
         elif(e.type == "reclassificar_caracteres"):
-            print("RECLASSIFICAÇÃO DE CARACTERES")
-            for token in self.tokens:
-                if (token.type == "util"):
-                    if (token.key >= '0' and token.key <= '9'):
-                        token.type = "digit"
-                    elif ((token.key >= "A" and token.key <= "Z") or (token.type >= 'a' and token.type <= 'z')):
-                        token.type = "letter"
-                    else:
-                        token.type = "special"
+            print("CLASSIFICAÇÃO LÉXICA")
+            for char in self.characters:
+                char.classify_ascii_char()
             self.add_event(Evento("extrair_tokens", self.tokens))
         elif (e.type == "extrair_tokens"):
             print("EXTRAÇÃO DE TOKENS")
@@ -75,13 +70,3 @@ class Evento():
     def __init__(self, t, v):
         self.type = t
         self.value = v
-
-class Token():
-    def __init__(self, t, k):
-        self.type = t
-        self.key = k
-
-class AsciiCharacter():
-    def __init__(self, c, t):
-        self.char = c
-        self.type = t
