@@ -1,5 +1,9 @@
 from SyntaticCateg import Token
 
+# global variables for automaton states
+INIT = 1
+
+
 class AsciiCharacter():
     def __init__(self, c, t):
         self.char = c
@@ -16,7 +20,11 @@ class AsciiCharacter():
 
 class AutomatonState():
     def __init__(self, n):
-        self.id = n
+        #the number of the state defined in the diagram
+        self.id = n 
+        
+        #the value read
+        self.read = "" 
 
 class LexerCategorizer:
     def __init__(self, characters, a):
@@ -27,7 +35,20 @@ class LexerCategorizer:
     
     def next_state(self,c,read):
         if (c.type == "descartavel" or c.type == "controle"):
-            if (self.automaton_state == )
+            if (self.automaton_state.id == 1):
+                type = "character"
+            elif (self.automaton_state.id == 2):
+                if (read.size == 2):
+                    type = "identifier"
+                else:
+                    type = "character"
+            elif (self.automaton_state.id == 5):
+                type = "int"
+            elif (self.automaton_state.id == 11):
+                if (read.begin == "+" or read.begin == "-"):
+                    type = "snum"
+                else:
+                    type = "num"
             self.generate_token(type,read)
         elif (self.a.id == 1):
             if (c.char == "letter"):
