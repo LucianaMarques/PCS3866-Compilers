@@ -6,7 +6,8 @@ class MotorDeEventos():
         # inicializa fila de eventos com "Inicio"
         self.q.put(Evento("inicio", None))
 
-        # Lista de tokens
+        # Lista de tokens  
+        self.characters = [] 
         self.tokens = []
 
     def event_extraction(self):
@@ -40,7 +41,7 @@ class MotorDeEventos():
                 t = "controle"
             else:
                 t = "util"
-            self.tokens.append(Token(t,e.value))
+            self.characters.append(AsciiCharacter(t,e.value))
             self.add_event(Evento("reclassificar_caracteres", self.tokens))
         elif(e.type == "reclassificar_caracteres"):
             print("RECLASSIFICAÇÃO DE CARACTERES")
@@ -58,11 +59,12 @@ class MotorDeEventos():
             tokens2 = []
             s = ""
             for token in self.tokens:
-                if (token.type == "letter"):
-                    #decidir se é identifier, character, composed ou reserved
-                    pass
-                
-                
+                if (token.type != "descartavel"):
+                    s = s + token.key
+                    if (token.type == "letter"):
+                        #decidir se é identifier, character, composed ou reserved
+                        pass
+                      
     def event_cycle(self):
         while (self.q.empty() == False):
             e = self.event_extraction()
@@ -79,3 +81,7 @@ class Token():
         self.type = t
         self.key = k
 
+class AsciiCharacter():
+    def __init__(self, c, t):
+        self.char = c
+        self.type = t
