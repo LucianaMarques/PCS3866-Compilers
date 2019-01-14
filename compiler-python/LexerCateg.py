@@ -37,13 +37,13 @@ class LexerCategorizer:
     
     def categorize(self):
         for i in range (len(self.characters)):
-            next_state(char,i)
+            next_state(i)
 
-    def next_state(self,c,i):
+    def next_state(self,i):
         # if we found an "EOL" on the diagram
-        if (c.type == "descartavel" or c.type == "controle"):
+        if (self.characters[i].type == "descartavel" or self.characters[i].type == "controle"):
             if (self.automaton_state.id == INIT):
-                type = "character"
+                self.generate_token(= "character"
             elif (self.automaton_state.id == ):
                 if (read.size == 2):
                     type = "identifier"
@@ -59,36 +59,87 @@ class LexerCategorizer:
             self.generate_token(type,read)
 
         # if current state is 1 in the diagram
-        elif (self.a.id == 1):
-            if (c.type == "letter"):
-                reserved = self.check_reserved()
-                composed = self.check_composed()
-                if (not reserved and not composed):
-                    a.read = a.read + c.char
-                    if (characters[i+1].type == "digit"):
-                        a.id = 3
-                    else:
-                        a.id = 4
-                    
-                elif (reserved):
+        else:
+            self.a.read = self.a.read + c.char
+            if (self.a.id == 1):
+                if (c.type == "letter"):
+                    reserved = self.check_reserved()
+                    composed = self.check_composed()
+                    if (not reserved and not composed):
+                        if (characters[i+1].type == "digit"):
+                            self.a.id = 3
+                        else:
+                            self.a.id = 4
+                        
+                    elif (reserved):
+                        pass
+                    elif (composed):
+                        pass
+
+                elif (c.type == "digit"):
+                    self.a.id = 4
+                elif (c.type == "special"):
+                    self.a.id = 4
+                elif (c.char == "+" or c.char == "-"):
+                    self.a.id = 5
+                elif (c.char == "."):
+                    self.a.id = 6
+                else:
+                    self.a.id = 6
+            
+            elif (self.a.id == 3):
+                self.generate_token("IDENTIFIER", a.red)
+            
+            # if current state is 4 and we're not considering buggy codes, it must be a character
+            elif (self.a.id == 4):
+                self.generate_token("CHARACTER", a.read)
+
+            elif (self.a.id == 5):
+                self.a.id = 6
+            
+            elif (self.a.id == 6):
+                self.a.id = 7
+            
+            elif (self.a.id == 7):
+                if (self.characters[i+1].type == "descartavel" or self.characters[i+1] == "controle"):
+                    self.generate_token("INT", self.a.read)
+                elif (self.characters[i+1].type == "digit"):
                     pass
-                elif (composed):
+                elif (self.characters[i+1].char == "."):
+                    self.a.id = 8
+                else:
+                    self.a.id = 9
+            
+            elif (self.a.id == 8):
+                if (self.characters[i+1].type == "digit"):
                     pass
+                else:
+                    self.a.id = 9
+            
+            elif (self.a.id == 9):
+                if (self.characters[i+1].char == "E"):
+                    self.a.id = 10
+                else:
+                    self.a.id = 13
+            
+            elif (self.a.id == 10):
+                self.a.id = 11
 
-            elif (c.char == "digit"):
-                a.id = 4
-            elif (c.char == "special"):
-                a.id = 4
-        
-        elif (self.id == 3):
-            self.generate_token("IDENTIFIER", a.red)
-        
-        # if current state is 4 and we're not considering buggy codes, it must be a character
-        elif (self.id == 4):
-            self.generate_token("CHARACTER", a.read)
-        
-
-
+            elif (self.a.id == 11):
+                self.a.id = 12
+            
+            elif (self.a.id == 12):
+                if (self.characters[i+1].type == "digit"):
+                    pass
+                else:
+                    self.a.id = 13
+            
+            elif (self.a.id == 13):
+                if (self.a.read[0] == "+" or self.a.read[0] == "-"):
+                    self.generate_token("SNUM", a.read)
+                else:
+                    self.generate_token("NUM", a.read)
+      
     def check_reserved(self):
         pass
     
