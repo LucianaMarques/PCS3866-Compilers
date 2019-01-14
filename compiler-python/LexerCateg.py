@@ -1,8 +1,10 @@
 from SyntaticCateg import Token
 
 # global variables for automaton states
-INIT = 1
-
+IDENTIFIER = 3
+CHARACTER = 4
+INT = 7
+NUM = 13
 
 class AsciiCharacter():
     def __init__(self, c, t):
@@ -22,22 +24,27 @@ class AutomatonState():
     def __init__(self, n):
         #the number of the state defined in the diagram
         self.id = n 
-        
+
         #the value read
         self.read = "" 
 
 class LexerCategorizer:
     def __init__(self, characters, a):
         # character list
-        self.characters = []
+        self.characters = characters
         self.automaton_state = a
         self.tokens = []
     
-    def next_state(self,c,read):
+    def categorize(self):
+        for i in range (len(self.characters)):
+            next_state(char,i)
+
+    def next_state(self,c,i):
+        # if we found an "EOL" on the diagram
         if (c.type == "descartavel" or c.type == "controle"):
-            if (self.automaton_state.id == 1):
+            if (self.automaton_state.id == INIT):
                 type = "character"
-            elif (self.automaton_state.id == 2):
+            elif (self.automaton_state.id == ):
                 if (read.size == 2):
                     type = "identifier"
                 else:
@@ -50,22 +57,43 @@ class LexerCategorizer:
                 else:
                     type = "num"
             self.generate_token(type,read)
+
+        # if current state is 1 in the diagram
         elif (self.a.id == 1):
-            if (c.char == "letter"):
+            if (c.type == "letter"):
                 reserved = self.check_reserved()
                 composed = self.check_composed()
-                if (reserved):
+                if (not reserved and not composed):
+                    a.read = a.read + c.char
+                    if (characters[i+1].type == "digit"):
+                        a.id = 3
+                    else:
+                        a.id = 4
+                    
+                elif (reserved):
+                    pass
+                elif (composed):
+                    pass
 
             elif (c.char == "digit"):
-                pass
+                a.id = 4
             elif (c.char == "special"):
-                pass
-    
+                a.id = 4
+        
+        elif (self.id == 3):
+            self.generate_token("IDENTIFIER", a.red)
+        
+        # if current state is 4 and we're not considering buggy codes, it must be a character
+        elif (self.id == 4):
+            self.generate_token("CHARACTER", a.read)
+        
+
+
     def check_reserved(self):
         pass
     
     def check_composed(self):
         pass
     
-    def generate_token(self, read):
-        tokens.append(Token(read))
+    def generate_token(self, type, key):
+        tokens.append(Token(type, key))
