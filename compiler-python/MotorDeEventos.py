@@ -1,5 +1,5 @@
 from queue import Queue
-from LexerCateg import AsciiCharacter, LexerCategorizer
+from LexerCateg import AsciiCharacter, LexerCategorizer, AutomatonState
 
 class MotorDeEventos():
     def __init__(self):
@@ -34,6 +34,7 @@ class MotorDeEventos():
             print("LINHA LIDA")
             for each in e.value:
                 self.add_event(Evento("classificar_caracter",each))
+                # print(each)
         elif (e.type == "classificar_caracter"):
             print("CLASSIFICAÇÃO DE CARACTERES")
             if (e.value == " "):
@@ -48,17 +49,22 @@ class MotorDeEventos():
             print("CLASSIFICAÇÃO LÉXICA")
             for char in self.characters:
                 char.classify_ascii_char()
+                # print(char.char)
             self.add_event(Evento("extrair_tokens", self.tokens))
         elif (e.type == "extrair_tokens"):
             print("EXTRAÇÃO DE TOKENS")
-            tokens2 = []
-            s = ""
-            for token in self.tokens:
-                if (token.type != "descartavel"):
-                    s = s + token.key
-                    if (token.type == "letter"):
-                        #decidir se é identifier, character, composed ou reserved
-                        pass
+            # s = ""
+            # for token in self.tokens:
+            #     if (token.type != "descartavel"):
+            #         s = s + token.key
+            #         if (token.type == "letter"):
+            #             #decidir se é identifier, character, composed ou reserved
+            #             pass
+            automatonState = AutomatonState()
+            lexCateg = LexerCategorizer(self.characters,automatonState)
+            lexCateg.categorize()
+            tokens2 = lexCateg.tokens
+            print(len(tokens2))
                       
     def event_cycle(self):
         while (self.q.empty() == False):
