@@ -23,6 +23,7 @@ class MotorDeEventos():
     def current_event(self, e):
         if (e.type == "inicio"):
             print("INICIO MOTOR DE EVENTOS")
+
         elif (e.type == "extrair_linhas"):
             print("INICIO LEITURA DO ARQUIVO FONTE")
             arquivo = e.value
@@ -30,11 +31,13 @@ class MotorDeEventos():
             for line in f:
                 line_event = Evento("extrair_caracteres", line)
                 self.add_event(line_event)
+        
         elif (e.type == "extrair_caracteres"):
             print("LINHA LIDA")
             for each in e.value:
                 self.add_event(Evento("classificar_caracter",each))
                 # print(each)
+
         elif (e.type == "classificar_caracter"):
             print("CLASSIFICAÇÃO DE CARACTERES")
             if (e.value == " "):
@@ -44,13 +47,16 @@ class MotorDeEventos():
             else:
                 t = "util"
             self.characters.append(AsciiCharacter(t,e.value))
-            self.add_event(Evento("reclassificar_caracteres", self.tokens))
+            if (self.q.qsize() == 0):
+                self.add_event(Evento("reclassificar_caracteres", self.tokens))
+
         elif(e.type == "reclassificar_caracteres"):
             print("CLASSIFICAÇÃO LÉXICA")
             for char in self.characters:
                 char.classify_ascii_char()
                 # print(char.char)
             self.add_event(Evento("extrair_tokens", self.tokens))
+
         elif (e.type == "extrair_tokens"):
             print("EXTRAÇÃO DE TOKENS")
             # s = ""
@@ -64,13 +70,13 @@ class MotorDeEventos():
             lexCateg = LexerCategorizer(self.characters,automatonState)
             lexCateg.categorize()
             tokens2 = lexCateg.tokens
-            print(len(tokens2))
+            for token in tokens2:
+                print(token.key)
                       
     def event_cycle(self):
         while (self.q.empty() == False):
             e = self.event_extraction()
             self.current_event(e)
-
 
 class Evento():
     def __init__(self, t, v):
