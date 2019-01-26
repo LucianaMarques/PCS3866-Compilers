@@ -42,22 +42,23 @@ class LexerCategorizer:
     def next_state(self,i):
         # if we found an "EOL" on the diagram
         if (self.characters[i].type == "descartavel" or self.characters[i].type == "controle"):
-            if (self.automaton_state.id == 4):
-                self.generate_token("CHARACTER", self.automaton_state.read)
-            elif (self.automaton_state.id == ):
-                if (read.size == 2):
-                    self.generate_token("IDENTIFIER", automaton_state.red)
-                else:
-                    self.generate_token("CHARACTER", self.automaton_state.read)
-            elif (self.automaton_state.id == 5):
+            if (self.automaton_state.id == 2):
                 self.generate_token("INT", self.automaton_state.read)
-            elif (self.automaton_state.id == 11):
+            elif (self.automaton_state.id == 4):
+                self.generate_token("CHARACTER", self.automaton_state.read)
+            elif (self.automaton_state.id == 7):
+                self.generate_token("INT", self.automaton_state.read)
+            elif (self.automaton_state.id == 13):
                 if (read.begin == "+" or read.begin == "-"):
                     self.generate_token("SNUM", self.automaton_state.read)
                 else:
                     self.generate_token("NUM", self.automaton_state.read)
+            elif (self.automaton_state.id == 17):
+                self.generate_token("COMPOSED", self.automaton_state.read)
+            # Goes back to the beginning
+            self.automaton_state.id = 1
 
-        if current state is 1 in the diagram
+        # if current state is 1 in the diagram
         else:
             self.automaton_state.read = self.automaton_state.read + self.characters[i].char
             # print(self.automaton_state.read)
@@ -66,7 +67,7 @@ class LexerCategorizer:
                     reserved = self.check_reserved()
                     composed = self.check_composed()
                     if (not reserved and not composed):
-                        if (characters[i+1].type == "digit"):
+                        if (self.characters[i+1].type == "digit"):
                             self.automaton_state.id = 3
                         else:
                             self.automaton_state.id = 4
@@ -77,7 +78,9 @@ class LexerCategorizer:
                         pass
 
                 elif (self.characters[i].type == "digit"):
-                    self.automaton_state.id = 4
+                    self.automaton_state.id = 6
+                    # self.automaton_state.id = 4
+                    # could be 4, check it out later
                 elif (self.characters[i].type == "special"):
                     self.automaton_state.id = 4
                 elif (self.characters[i].char == "+" or self.characters[i].char == "-"):
@@ -88,7 +91,7 @@ class LexerCategorizer:
                     self.automaton_state.id = 6
             
             elif (self.automaton_state.id == 3):
-                self.generate_token("IDENTIFIER", automaton_state.red)
+                self.generate_token("IDENTIFIER", self.automaton_state.read)
                 self.automaton_state.id = 1
                 self.automaton_state.read = ""
             

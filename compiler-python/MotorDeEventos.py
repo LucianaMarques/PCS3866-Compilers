@@ -29,6 +29,7 @@ class MotorDeEventos():
             arquivo = e.value
             f = open(arquivo, 'r')
             for line in f:
+                line = line + '\n'
                 line_event = Evento("extrair_caracteres", line)
                 self.add_event(line_event)
         
@@ -71,7 +72,7 @@ class MotorDeEventos():
             lexCateg.categorize()
             tokens2 = lexCateg.tokens
             for token in tokens2:
-                print(token.key)
+                 print(token.type)
                       
     def event_cycle(self):
         while (self.q.empty() == False):
