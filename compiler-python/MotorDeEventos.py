@@ -72,6 +72,8 @@ class MotorDeEventos():
         elif (e.type == "recategorizar_tokens"):
             print("RECATEGORIZAR TOKENS")
             parser = Parser(e.value)
+            for token in parser.tokens:
+                print(token.key)
             parser.recategorize()
             for token in parser.tokens:
                 print(token.key)
