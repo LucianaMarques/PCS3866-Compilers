@@ -2,6 +2,9 @@ from queue import Queue
 from LexerCateg import AsciiCharacter, LexerCategorizer, AutomatonState
 from SyntaticCateg import Token, Parser
 
+# Parser
+parser = Parser()
+
 class MotorDeEventos():
     def __init__(self):
         self.q = Queue()
@@ -61,23 +64,27 @@ class MotorDeEventos():
 
         elif (e.type == "extrair_tokens"):
             print("EXTRAÇÃO DE TOKENS")
+            # Categorizador Léxico - autômato
             automatonState = AutomatonState()
             lexCateg = LexerCategorizer(self.characters,automatonState)
             lexCateg.categorize()
             tokens2 = lexCateg.tokens
-            for token in tokens2:
-                print(token.type)
+            # for token in tokens2:
+            #     print(token.type)
             self.add_event(Evento("recategorizar_tokens", tokens2))
         
         elif (e.type == "recategorizar_tokens"):
             print("RECATEGORIZAR TOKENS")
-            parser = Parser(e.value)
+            parser.tokens = e.value
+            parser.recategorize_tokens()
             for token in parser.tokens:
-                print(token.key)
-            parser.recategorize()
-            for token in parser.tokens:
-                print(token.key)
-                      
+                print(token.type)
+            self.add_event(Evento("extrair_sintaxes", parser))
+        
+        elif (e.type == "extrair_sintaxes"):
+            print("EXTRAÇÃO DE SINTAXES")
+            parser.syntax_categorize()
+
     def event_cycle(self):
         while (self.q.empty() == False):
             e = self.event_extraction()
