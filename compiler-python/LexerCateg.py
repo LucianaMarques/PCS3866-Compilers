@@ -36,13 +36,19 @@ class LexerCategorizer:
         self.tokens = []
     
     def categorize(self):
-        for i in range (len(self.characters)):
-            self.next_state(i)
+        i = 0 
+        while (i < len(self.characters)):
+            print(self.characters[i].char)
+            proximo = self.next_state(i)
+            print("i: ", i)
+            print("estado: ", self.automaton_state.id)
+            i += proximo
 
     def next_state(self,i):
+        proximo = 1
         # if we found an "EOL" on the diagram
         if (self.characters[i].type == "descartavel" or self.characters[i].type == "controle"):
-            if (self.automaton_state.id == 2):
+            if (self.automaton_state.id == 3):
                 self.generate_token("INT", self.automaton_state.read)
             elif (self.automaton_state.id == 4):
                 self.generate_token("CHARACTER", self.automaton_state.read)
@@ -53,10 +59,11 @@ class LexerCategorizer:
                     self.generate_token("SNUM", self.automaton_state.read)
                 else:
                     self.generate_token("NUM", self.automaton_state.read)
-            elif (self.automaton_state.id == 17):
-                self.generate_token("COMPOSED", self.automaton_state.read)
+            elif (self.automaton_state.id == 18):
+                self.generate_token("RESERVED", self.automaton_state.read)    
             # Goes back to the beginning
             self.automaton_state.id = 1
+            self.automaton_state.read = ""
 
         # if current state is 1 in the diagram
         else:
@@ -64,18 +71,21 @@ class LexerCategorizer:
             # print(self.automaton_state.read)
             if (self.automaton_state.id == 1):
                 if (self.characters[i].type == "letter"):
-                    reserved = self.check_reserved()
-                    composed = self.check_composed()
-                    if (not reserved and not composed):
+                    if (i!= len(self.characters) - 1):
+                        reserved, extra = self.check_reserved(i)
+                    else:
+                        reserved = False
+                        extra = ''
+                    print(reserved)
+                    if (not reserved):
                         if (self.characters[i+1].type == "digit"):
                             self.automaton_state.id = 3
                         else:
                             self.automaton_state.id = 4
-                        
-                    elif (reserved):
-                        pass
-                    elif (composed):
-                        pass
+                    else:
+                        self.automaton_state.read = self.automaton_state.read + extra
+                        self.automaton_state.id = 18
+                        proximo = len(extra) + 1
 
                 elif (self.characters[i].type == "digit"):
                     self.automaton_state.id = 6
@@ -89,16 +99,6 @@ class LexerCategorizer:
                     self.automaton_state.id = 6
                 else:
                     self.automaton_state.id = 6
-            
-            elif (self.automaton_state.id == 3):
-                self.generate_token("IDENTIFIER", self.automaton_state.read)
-                self.automaton_state.id = 1
-                self.automaton_state.read = ""
-            
-            # if current state is 4 and we're not considering buggy codes, it must be a character
-            elif (self.automaton_state.id == 4):
-                self.generate_token("CHARACTER", self.automaton_state.read)
-                self.automaton_state.read = ""
 
             elif (self.automaton_state.id == 5):
                 self.automaton_state.id = 6
@@ -107,12 +107,10 @@ class LexerCategorizer:
                 self.automaton_state.id = 7
             
             elif (self.automaton_state.id == 7):
-                if (self.characters[i+1].type == "descartavel" or self.characters[i+1] == "controle"):
-                    self.generate_token("INT", self.automaton_state.read)
-                    self.automaton_state.id = 1
-                    self.automaton_state.read = ""
-                elif (self.characters[i+1].type == "digit"):
-                    pass
+                if (self.characters[i+1].type == "digit"):
+                    self.automaton_state.id = 7
+                if (self.characters[i+1].type == "descartavel"):
+                    self.automaton_state.id = 7
                 elif (self.characters[i+1].char == "."):
                     self.automaton_state.id = 8
                 else:
@@ -142,24 +140,124 @@ class LexerCategorizer:
                 else:
                     self.automaton_state.id = 13
             
-            elif (self.automaton_state.id == 13):
-                if (self.automaton_state.read[0] == "+" or self.automaton_state.read[0] == "-"):
-                    self.generate_token("SNUM", automaton_state.read)
-                    self.automaton_state.id = 1
-                    self.automaton_state.read = ""
-                else:
-                    self.generate_token("NUM", self.automaton_state.read)
-                    self.automaton_state.id = 1
-                    self.automaton_state.read = ""
-            
             else:
                 pass
+        
+        return proximo
       
-    def check_reserved(self):
-        pass
-    
-    def check_composed(self):
-        pass
+    # Check for RESERVED type token
+    def check_reserved(self, i):
+        #“ABS” | “ATN” 
+        if (self.characters[i].char == 'A'):
+            if (self.characters[i+1].char == 'B'):
+                return True, 'BS'
+            elif(self.characters[i+1].char == 'T'):
+                return True, 'TN'
+            else:
+                return False, ''
+        elif (self.characters[i].char == 'C'):
+            if (self.characters[i+1] == 'O'):
+                return True, 'OS'
+            else:
+                return False, ''
+        #“DATA” | “DEF” | “DIM” 
+        elif (self.characters[i].char == 'D'):
+            if (self.characters[i+1].char == 'A'):
+                return True, 'ATA'
+            elif (self.characters[i+1].char == 'E'):
+                return True, 'EF'
+            elif (self.characters[i+1].char == 'I'):
+                return True, 'IM'
+            else:
+                return False, ''
+        # “END” |“EXP”
+        elif (self.characters[i].char == 'E'):
+            if (self.characters[i+1].char == 'N'):
+                return True, 'ND'
+            elif (self.characters[i+1].char == 'X'):
+                return True, 'XP'
+            else:
+                return False, ''
+        # “FN” |“FOR”
+        elif (self.characters[i].char == 'F'):
+            if (self.characters[i+1].char == 'N'):
+                return True, 'N'
+            elif (self.characters[i+1].char == 'O'):
+                return True, 'OR'
+            else:
+                return False, ''
+        # “GO” | “GOSUB” | “GOTO”
+        elif (self.characters[i].char == 'G'):
+            if (self.characters[i+2].char == 'S'):
+                return True, 'OSUB'
+            elif (self.characters[i+2].char == 'T'):
+                return True, 'OTO'
+            elif (self.characters[i+1].char == 'O'):
+                return True, 'O'
+            else:
+                return False, ''
+        # “IF” |“INT”
+        elif (self.characters[i].char == 'I'):
+            if (self.characters[i+1].char == 'F'):
+                return True, 'F'
+            elif (self.characters[i+1].char == 'N'):
+                return True, 'NT'
+            else:
+                return False, ''    
+        # “LET” | “LOG”
+        elif (self.characters[i].char == 'L'):
+            if (self.characters[i+1].char == 'E'):
+                return True, 'ET'
+            elif (self.characters[i+1].char == 'O'):
+                return True, 'OG'
+            else:
+                return False, ''
+        # "NEXT"
+        elif (self.characters[i].char == 'N'):
+            if (self.characters[i+1] == 'E'):
+                return True, 'EXT'
+            else:
+                return False, ''
+        # "PRINT"
+        elif (self.characters[i].char == 'P'):
+            if (self.characters[i+1] == 'R'):
+                return True, 'RINT'
+            else:
+                return False, ''
+        # “READ” |“REM” | “RETURN” | “RND”
+        elif (self.characters[i].char == 'R'):
+            if (self.characters[i+1].char == 'N'):
+                return True, 'ND'
+            elif (self.characters[i+2].char == 'A'):
+                return True, 'EAD'
+            elif (self.characters[i+2].char == 'T'):
+                return True, 'ETURN'
+            elif (self.characters[i+2].char == 'M'):
+                return True, 'EM'
+            else:
+                return False, ''
+        # “SIN” |“SQR” |“STEP”
+        elif (self.characters[i].char == 'S'):
+            if (self.characters[i+1].char == 'I'):
+                return True, 'IN'
+            elif (self.characters[i+1].char == 'Q'):
+                return True, 'QR'
+            elif (self.characters[i+1].char == 'T'):
+                return True, 'TEP'
+            else:
+                return False, ''
+        # “TAN” | “THEN” | “TO”
+        elif (self.characters[i].char == 'T'):
+            if (self.characters[i+1].char == 'A'):
+                return True, 'AN'
+            elif (self.characters[i+1].char == 'H'):
+                return True, 'HEN'
+            elif (self.characters[i+1].char == 'O'):
+                return True, 'O'
+            else:
+                return False, ''
+        else:
+            return False, ''
     
     def generate_token(self, type, key):
         self.tokens.append(Token(type, key))

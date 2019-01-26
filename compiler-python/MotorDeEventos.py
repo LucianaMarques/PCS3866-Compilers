@@ -1,5 +1,6 @@
 from queue import Queue
 from LexerCateg import AsciiCharacter, LexerCategorizer, AutomatonState
+from SyntaticCateg import Token, Parser
 
 class MotorDeEventos():
     def __init__(self):
@@ -29,7 +30,7 @@ class MotorDeEventos():
             arquivo = e.value
             f = open(arquivo, 'r')
             for line in f:
-                line = line + '\n'
+                line = line + ' '
                 line_event = Evento("extrair_caracteres", line)
                 self.add_event(line_event)
         
@@ -60,19 +61,20 @@ class MotorDeEventos():
 
         elif (e.type == "extrair_tokens"):
             print("EXTRAÇÃO DE TOKENS")
-            # s = ""
-            # for token in self.tokens:
-            #     if (token.type != "descartavel"):
-            #         s = s + token.key
-            #         if (token.type == "letter"):
-            #             #decidir se é identifier, character, composed ou reserved
-            #             pass
             automatonState = AutomatonState()
             lexCateg = LexerCategorizer(self.characters,automatonState)
             lexCateg.categorize()
             tokens2 = lexCateg.tokens
             for token in tokens2:
-                 print(token.type)
+                print(token.type)
+            self.add_event(Evento("recategorizar_tokens", tokens2))
+        
+        elif (e.type == "recategorizar_tokens"):
+            print("RECATEGORIZAR TOKENS")
+            parser = Parser(e.value)
+            parser.recategorize()
+            for token in parser.tokens:
+                print(token.key)
                       
     def event_cycle(self):
         while (self.q.empty() == False):
