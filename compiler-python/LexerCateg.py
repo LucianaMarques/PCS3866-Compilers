@@ -65,6 +65,11 @@ class LexerCategorizer:
             self.automaton_state.id = 1
             self.automaton_state.read = ""
 
+            # Adds an EOL token in case it's the end of a line
+            if (self.characters[i].type == "controle"):
+                self.generate_token("EOL", "")
+
+
         # if current state is 1 in the diagram
         else:
             self.automaton_state.read = self.automaton_state.read + self.characters[i].char
