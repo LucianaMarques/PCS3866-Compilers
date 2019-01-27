@@ -38,10 +38,11 @@ class LexerCategorizer:
     def categorize(self):
         i = 0 
         while (i < len(self.characters)):
-            #print(self.characters[i].char)
+            print(self.characters[i].type)
+            print(self.characters[i].char)
             proximo = self.next_state(i)
-            #print("i: ", i)
-            #print("estado: ", self.automaton_state.id)
+            print("i: ", i)
+            print("estado: ", self.automaton_state.id)
             i += proximo
 
     def next_state(self,i):
@@ -49,26 +50,40 @@ class LexerCategorizer:
         # if we found an "EOL" on the diagram
         if (self.characters[i].type == "descartavel" or self.characters[i].type == "controle"):
             if (self.automaton_state.id == 3):
-                self.generate_token("INT", self.automaton_state.read)
+                self.generate_token("IDENTIFIER", self.automaton_state.read)
+                # Adds an EOL token in case it's the end of a line
+                if (self.characters[i].type == "controle"):
+                    self.generate_token("EOL", "")
             elif (self.automaton_state.id == 4):
                 self.generate_token("CHARACTER", self.automaton_state.read)
+                # Adds an EOL token in case it's the end of a line
+                if (self.characters[i].type == "controle"):
+                    self.generate_token("EOL", "")
             elif (self.automaton_state.id == 7):
                 self.generate_token("INT", self.automaton_state.read)
+                # Adds an EOL token in case it's the end of a line
+                if (self.characters[i].type == "controle"):
+                    self.generate_token("EOL", "")
             elif (self.automaton_state.id == 13):
-                if (read.begin == "+" or read.begin == "-"):
+                if (self.automaton_state.read[0] == '+' or self.automaton_state.read[0] == "-"):
                     self.generate_token("SNUM", self.automaton_state.read)
+                    # Adds an EOL token in case it's the end of a line
+                    if (self.characters[i].type == "controle"):
+                        self.generate_token("EOL", "")
                 else:
                     self.generate_token("NUM", self.automaton_state.read)
+                    # Adds an EOL token in case it's the end of a line
+                    if (self.characters[i].type == "controle"):
+                        self.generate_token("EOL", "")
             elif (self.automaton_state.id == 18):
-                self.generate_token("RESERVED", self.automaton_state.read)    
+                self.generate_token("RESERVED", self.automaton_state.read) 
+                # Adds an EOL token in case it's the end of a line
+                if (self.characters[i].type == "controle"):
+                    self.generate_token("EOL", "")   
+            
             # Goes back to the beginning
             self.automaton_state.id = 1
             self.automaton_state.read = ""
-
-            # Adds an EOL token in case it's the end of a line
-            if (self.characters[i].type == "controle"):
-                self.generate_token("EOL", "")
-
 
         # if current state is 1 in the diagram
         else:
@@ -93,7 +108,10 @@ class LexerCategorizer:
                         proximo = len(extra) + 1
 
                 elif (self.characters[i].type == "digit"):
-                    self.automaton_state.id = 6
+                    if (self.characters[i+1].type == "descartavel" or self.characters[i+1].type == "controle"):
+                        self.automaton_state.id = 7
+                    else:
+                        self.automaton_state.id = 6
                     # self.automaton_state.id = 4
                     # could be 4, check it out later
                 elif (self.characters[i].type == "special"):
@@ -177,7 +195,9 @@ class LexerCategorizer:
                 return False, ''
         # “END” |“EXP”
         elif (self.characters[i].char == 'E'):
+            print("hey")
             if (self.characters[i+1].char == 'N'):
+                print("hey2")
                 return True, 'ND'
             elif (self.characters[i+1].char == 'X'):
                 return True, 'XP'
@@ -225,12 +245,13 @@ class LexerCategorizer:
                 return False, ''
         # "PRINT"
         elif (self.characters[i].char == 'P'):
-            if (self.characters[i+1] == 'R'):
+            if (self.characters[i+1].char == 'R'):
                 return True, 'RINT'
             else:
                 return False, ''
         # “READ” |“REM” | “RETURN” | “RND”
         elif (self.characters[i].char == 'R'):
+            print("hey")
             if (self.characters[i+1].char == 'N'):
                 return True, 'ND'
             elif (self.characters[i+2].char == 'A'):
@@ -266,3 +287,4 @@ class LexerCategorizer:
     
     def generate_token(self, type, key):
         self.tokens.append(Token(type, key))
+        print("generated token ", type)

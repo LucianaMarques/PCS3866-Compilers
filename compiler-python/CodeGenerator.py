@@ -1,5 +1,6 @@
 '''
 Part of the code in this file was highly based on llvmlite's docs!
+Reference for PRINT function: https://gist.github.com/alendit/defe3d518cd8f3f3e28cb46708d4c9d6
 '''
 
 import llvmlite.ir as ir
@@ -74,23 +75,38 @@ int = ir.IntType(64);
 double = ir.DoubleType()
 
 #function types definitions
-fn_int_to_int_type = ir.FunctionType(int_type, [int_type])
+#fn_int_to_int_type = ir.FunctionType(int_type, [int_type])
+# void types, used in: PRINT
+fn_void = ir.FunctionType(ir.VoidType(), [])
+voidptr_ty = ir.IntType(8).as_pointer()
+
+# known function definition
+# PRINT
+printf_ty = ir.FunctionType(ir.IntType(32), [voidptr_ty], var_arg=True)
+printf = ir.Function(m, printf_ty, name="printf")
 
 class CodeGenerator:
     def __init__ (self):
         self.module = ir.Module()
         self.builder = ir.IRBuilder()
 
+    # for debug purposes
+    def print_module(self):
+        print(self.module)
+
     # adds a variable to the symbol table
-    def generate_global_variable(self):
-        pass
+    def generate_global_variable(self, name, value):
+        glob = ir.GlobalVariable(self.module, int, name)
+        glob.initializer = ir.Constant(int,value)
 
     # adds a programmer-defined function
     def generate_user_function(self, func_name):
         pass
-
-    # adds knows functions (print, sin, cos, etc)
-    def generate_known_functions(self):
+    
+    def _printf_id(self):
+        func = ir.Function(self.module, void, name="printf")
+    
+    def _printf_num(self):
         pass
     
     #generates executable code
