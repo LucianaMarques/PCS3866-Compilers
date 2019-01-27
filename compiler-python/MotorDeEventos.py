@@ -1,9 +1,18 @@
 from queue import Queue
 from LexerCateg import AsciiCharacter, LexerCategorizer, AutomatonState
 from SyntaticCateg import Token, Parser
+from CodeGenerator import CodeGenerator
 
 # Parser
 parser = Parser()
+
+# Code Genegerator
+codeGen = CodeGenerator()
+
+class Evento():
+    def __init__(self, t, v):
+        self.type = t
+        self.value = v
 
 class MotorDeEventos():
     def __init__(self):
@@ -84,13 +93,12 @@ class MotorDeEventos():
         elif (e.type == "extrair_sintaxes"):
             print("EXTRAÇÃO DE SINTAXES")
             parser.syntax_categorize()
+            self.add_event(Evento("geracao_codigo", parser.sintaxes))
+        
+        elif (e.type == "geracao_codigo"):
+            pass
 
     def event_cycle(self):
         while (self.q.empty() == False):
             e = self.event_extraction()
             self.current_event(e)
-
-class Evento():
-    def __init__(self, t, v):
-        self.type = t
-        self.value = v

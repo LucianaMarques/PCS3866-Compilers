@@ -7,7 +7,7 @@ class Token():
         self.type = t
         self.key = k
 
-class Syntax()
+class Syntax():
     def __init__ (self, t):
         self.tokens = t
         self.name = None
@@ -48,4 +48,4 @@ class Parser():
             pass
     
     def next_state(self, i):
-        
+        pass
