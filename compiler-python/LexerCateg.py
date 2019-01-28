@@ -38,11 +38,11 @@ class LexerCategorizer:
     def categorize(self):
         i = 0 
         while (i < len(self.characters)):
-            print(self.characters[i].type)
-            print(self.characters[i].char)
+            # print(self.characters[i].type)
+            # print(self.characters[i].char)
             proximo = self.next_state(i)
-            print("i: ", i)
-            print("estado: ", self.automaton_state.id)
+            # print("i: ", i)
+            # print("estado: ", self.automaton_state.id)
             i += proximo
 
     def next_state(self,i):

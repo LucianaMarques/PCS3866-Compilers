@@ -94,7 +94,7 @@ class Parser():
             # Do not make anything when REM
             elif(self.check_rem(i)):
                 j = i
-                while(self.tokens[j]!=EOL):
+                while(self.tokens[j].type!='EOL'):
                     j += 1
                 proximo = j - i
             
@@ -105,7 +105,7 @@ class Parser():
         elif(self.automaton_state.id == 3):
             # self.variables.append((self.tokens[i].key,self.tokens[i+2].key))
             # print(self.tokens[i].key,self.tokens[i+2].key)
-            self.codeGenerator.generate_global_variable(self.tokens[i].key,int(self.tokens[i+2].key))
+            self.codeGenerator.generate_global_variable(self.tokens[i].key,int(self.tokens[i+1].key))
             proximo = 3
         
         # print an identifier's value

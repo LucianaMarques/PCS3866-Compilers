@@ -141,7 +141,7 @@ class CodeGenerator:
         builder.ret_void()
 
         llvm_ir = str(self.module)
-        print(llvm_ir)
+        #print(llvm_ir)
         engine = create_execution_engine()
         mod = compile_ir(engine, llvm_ir)
         # Look up the function pointer (a Python int)
@@ -152,4 +152,5 @@ class CodeGenerator:
         cfunc()
 
     def generate_code(self):
+        self.print_module()
         print("END")

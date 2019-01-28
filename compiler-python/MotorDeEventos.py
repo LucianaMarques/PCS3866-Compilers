@@ -42,7 +42,9 @@ class MotorDeEventos():
             arquivo = e.value
             f = open(arquivo, 'r')
             for line in f:
-                self.add_event(Evento("extrair_caracteres", line))
+                # Ignore remark lines
+                if (line[4:7] != 'REM'):
+                    self.add_event(Evento("extrair_caracteres", line))
         
         elif (e.type == "extrair_caracteres"):
             print("LINHA LIDA")
@@ -66,7 +68,7 @@ class MotorDeEventos():
             print("CLASSIFICAÇÃO LÉXICA")
             for char in self.characters:
                 char.classify_ascii_char()
-                print(char.type)
+                #print(char.type)
             self.add_event(Evento("extrair_tokens", self.tokens))
 
         elif (e.type == "extrair_tokens"):
@@ -76,8 +78,8 @@ class MotorDeEventos():
             lexCateg = LexerCategorizer(self.characters,automatonState)
             lexCateg.categorize()
             tokens2 = lexCateg.tokens
-            for token in tokens2:
-                print(token.type)
+            # for token in tokens2:
+            #     print(token.type)
             self.add_event(Evento("recategorizar_tokens", tokens2))
         
         elif (e.type == "recategorizar_tokens"):
