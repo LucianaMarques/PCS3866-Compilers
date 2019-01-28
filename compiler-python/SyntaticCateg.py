@@ -99,7 +99,7 @@ class Parser():
                 proximo = j - i
             
             elif(self.check_end(i)):
-                self.codeGenerator.print_module()
+                self.generate_code()
         
         # add a new variable to the global variables' table
         elif(self.automaton_state.id == 3):
@@ -110,7 +110,7 @@ class Parser():
         
         # print an identifier's value
         elif(self.automaton_state.id == 8):
-            pass
+            self.codeGenerator.printf_id(self.tokens[i].key)
 
         return proximo
 
