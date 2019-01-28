@@ -138,14 +138,10 @@ class CodeGenerator:
 
         fmt_arg = builder.bitcast(global_fmt, voidptr_ty)
         builder.call(printf, [fmt_arg, c_str, int_val])
-
         builder.ret_void()
 
-        print(str(self.module))
-    
-    #generates executable code
-    def generate_code(self):
         llvm_ir = str(self.module)
+        print(llvm_ir)
         engine = create_execution_engine()
         mod = compile_ir(engine, llvm_ir)
         # Look up the function pointer (a Python int)
@@ -154,3 +150,6 @@ class CodeGenerator:
         # Run the function via ctypes
         cfunc = CFUNCTYPE(None)(func_ptr)
         cfunc()
+
+    def generate_code(self):
+        print("END")
