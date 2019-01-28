@@ -8,9 +8,9 @@ import llvmlite.binding as llvm
 from ctypes import CFUNCTYPE
 
 # necessary to code generation
-# llvm.initialize()
-# llvm.initialize_native_target()
-# llvm.initialize_native_asmprinter() 
+llvm.initialize()
+llvm.initialize_native_target()
+llvm.initialize_native_asmprinter() 
 
 def create_execution_engine():
     """
@@ -141,33 +141,16 @@ class CodeGenerator:
 
         builder.ret_void()
 
-        llvm.initialize()
-        llvm.initialize_native_target()
-        llvm.initialize_native_asmprinter()
-
         print(str(self.module))
-        llvm_module = llvm.parse_assembly(str(self.module))
-        tm = llvm.Target.from_default_triple().create_target_machine()
-
-        with llvm.create_mcjit_compiler(llvm_module, tm) as ee:
-            ee.finalize_object()
-            fptr = ee.get_function_address("printer")
-            py_func = CFUNCTYPE(None)(fptr)
-            py_func()
-
-        print("Code made")
-
-    def _printf_num(self):
-        pass
     
     #generates executable code
     def generate_code(self):
-        pass
-        # self.print_module()
-        # llvm_module = llvm.parse_assembly(str(self.module))
-        # tm = llvm.Target.from_default_triple().create_target_machine()
-        # with llvm.create_mcjit_compiler(llvm_module, tm) as ee:
-        #     ee.finalize_object()
-        #     fptr = ee.get_function_address("printer")
-        #     py_func = CFUNCTYPE(None)(fptr)
-        #     py_func()
+        llvm_ir = str(self.module)
+        engine = create_execution_engine()
+        mod = compile_ir(engine, llvm_ir)
+        # Look up the function pointer (a Python int)
+        func_ptr = engine.get_function_address("printer")
+
+        # Run the function via ctypes
+        cfunc = CFUNCTYPE(None)(func_ptr)
+        cfunc()
