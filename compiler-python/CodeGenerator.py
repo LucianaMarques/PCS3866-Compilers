@@ -5,6 +5,7 @@ Reference for PRINT function: https://gist.github.com/alendit/defe3d518cd8f3f3e2
 
 import llvmlite.ir as ir
 import llvmlite.binding as llvm
+import llvmlite.llvmpy
 from ctypes import CFUNCTYPE
 
 # necessary to code generation
@@ -99,6 +100,9 @@ class CodeGenerator:
         # Cria todas as funções pre-definidas
         self.generate_predef()
 
+        # Debugging purposes:
+        self.print_module()
+
     # for debug purposes
     def print_module(self):
         print(self.module)
@@ -121,8 +125,7 @@ class CodeGenerator:
         voidptr_ty = ir.IntType(8).as_pointer()
 
         fmt = "%s%i\n\0"
-        c_fmt = ir.Constant(ir.ArrayType(ir.IntType(8), len(fmt)),
-                            bytearray(fmt.encode("utf8")))
+        c_fmt = ir.Constant(ir.ArrayType(ir.IntType(8), len(fmt)),bytearray(fmt.encode("utf8")))
         global_fmt = ir.GlobalVariable(self.module, c_fmt.type, name="fstr")
         global_fmt.linkage = 'internal'
         global_fmt.global_constant = True
@@ -147,7 +150,6 @@ class CodeGenerator:
         builder.ret_void()
 
         llvm_ir = str(self.module)
-        #print(llvm_ir)
         engine = create_execution_engine()
         mod = compile_ir(engine, llvm_ir)
         # Look up the function pointer (a Python int)

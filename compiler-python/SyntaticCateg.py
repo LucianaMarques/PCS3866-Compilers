@@ -65,7 +65,6 @@ class Parser():
             self.automaton_state.id = 1
 
         elif (self.automaton_state.id == 1):
-            self.codeGenerator.print_module()
             self.automaton_state.id = 2
 
         elif (self.automaton_state.id == 2):
@@ -110,7 +109,8 @@ class Parser():
         elif(self.automaton_state.id == 3):
             # self.variables.append((self.tokens[i].key,self.tokens[i+2].key))
             # print(self.tokens[i].key,self.tokens[i+2].key)
-            self.codeGenerator.generate_global_variable(self.tokens[i].key,int(self.tokens[i+2].key))
+            value = self.get_expression_value()
+            self.codeGenerator.generate_global_variable(self.tokens[i].key,value)
             proximo = 3
         
         # print an identifier's value
@@ -204,3 +204,49 @@ class Parser():
             return False
         else:
             return True
+
+    def get_expression_value(self, i):
+        proximo = i
+        negative = 0
+        operation = 0
+        # verifica se é negativo
+        if (tokens[i].key == '-'):
+                negative = 1
+                proximo += 1
+        value = 0
+        while(tokens[proximo].type != EOL):
+            if (tokens[proximo].key == '+'):
+                operation = 1
+            elif(tokens[proximo].key == '-'):
+                operation = 2
+            elif (tokens[proximo].key == '*'):
+                operation = 3
+            elif(tokens[proximo].key == '/'):
+                operation = 4
+            else:
+                eb = self.check_eb()
+                if (operation == 0):
+                    value = eb
+                    if negative:
+                        value = -value
+                elif (operation == 1):
+                    value += eb
+                elif (operation == 2):
+                    value -= eb
+                elif (operation == 3):
+                    value = eb*value
+                elif (operation == 4):
+                    value = value/eb
+            proximo += 1
+        return value
+
+    def check_eb(self, i):
+        # verifica se é número
+        if(tokens[proximo].type == INT):
+            value = value + int(tokens[proximo].char)
+        # varifica se é variável global
+        elif(tokens[proximo].type == CHARACTER):
+            pass
+        elif(tokens[proximo].type == RESERVED):
+            # manda uma flag para o codeGenerator
+            pass    
