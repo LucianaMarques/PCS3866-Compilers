@@ -242,11 +242,28 @@ class Parser():
 
     def check_eb(self, i):
         # verifica se é número
-        if(tokens[proximo].type == INT):
-            value = value + int(tokens[proximo].char)
+        if(self.tokens[i].type == INT):
+            return int(self.tokens[i].char)
         # varifica se é variável global
-        elif(tokens[proximo].type == CHARACTER):
-            pass
-        elif(tokens[proximo].type == RESERVED):
+        elif(self.tokens[i].type == CHARACTER):
+            if (self.tokens[i].key in self.variables):
+                return int(self.variables[tokens[i].key])
+            elif (self.tokens[i].char == "FN"):
+                return self.calculate_function(i)
+        elif(tokens[i].type == RESERVED):
             # manda uma flag para o codeGenerator
-            pass    
+            if (tokens[i].key == "SIN"):
+                pass
+            elif (tokens[i].key == "COS"):
+                pass
+            elif (tokens[i].key == "TAN"):
+                pass
+            elif (tokens[i].key == "EXP"):
+                pass
+            elif (tokens[i].key == "ABS"):
+                pass
+            elif (tokens[i].key == "LOG"):
+                pass
+            elif (tokens[i].key == "SQR"):
+                pass
+        return 0
