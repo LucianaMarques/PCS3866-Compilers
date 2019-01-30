@@ -61,6 +61,7 @@ class Parser():
             print("TOKEN: ", self.tokens[i].type, self.tokens[i].key, "ESTADO: ", self.automaton_state.id)
             proximo = self.next_state(i)
             i += proximo
+            print(i)
     
     def next_state(self, i):
         proximo = 1
@@ -127,14 +128,15 @@ class Parser():
             variable = self.tokens[i].key[2]
             # assume-se tipo da função sempre DOUBLE
             proximo = self.generate_function(name, variable, i)
-            #self.codeGenerator.generate_user_function(name)
 
         return proximo
     
     # Cria a regra
     def generate_function(self, name, variable, i):
+        print("GENERATE FUNCTION")
         tokens = []
         while(self.tokens[i].type != 'EOL'):
+            print(self.tokens[i].type)
             tokens.append(self.tokens[i])
             i += 1
         # add the captured tokens
