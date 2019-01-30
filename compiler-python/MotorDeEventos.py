@@ -44,16 +44,16 @@ class MotorDeEventos():
             for line in f:
                 # Ignore remark lines
                 if (line[4:7] != 'REM'):
+                    print("LINHA LIDA")
                     self.add_event(Evento("extrair_caracteres", line))
         
         elif (e.type == "extrair_caracteres"):
-            print("LINHA LIDA")
+            print("CLASSIFICAÇÃO DE CARACTERES")
             for each in e.value:
                 self.add_event(Evento("classificar_caracter",each))
                 # print(each)
 
         elif (e.type == "classificar_caracter"):
-            print("CLASSIFICAÇÃO DE CARACTERES")
             if (e.value == " "):
                 t = "descartavel"
             elif (e.value == '\n'):
@@ -97,7 +97,11 @@ class MotorDeEventos():
         
         elif (e.type == "geracao_codigo"):
             print("CODIGO GERADO")
-            pass
+            # parser.generate_code()
+            self.add_event(Evento("fim"))
+        
+        elif (e.type == "fim"):
+            print("FIM DE COMPILAÇÃO")
 
     def event_cycle(self):
         while (self.q.empty() == False):

@@ -287,4 +287,4 @@ class LexerCategorizer:
     
     def generate_token(self, type, key):
         self.tokens.append(Token(type, key))
-        print("generated token ", type)
+        print("generated token ", type, key)

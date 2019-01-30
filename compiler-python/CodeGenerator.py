@@ -91,7 +91,13 @@ double = ir.DoubleType()
 class CodeGenerator:
     def __init__ (self):
         self.module = ir.Module()
+        # tabela de símbolos de variáveis
         self.global_variables = {}
+        # tabela de símbolos de funções definidas
+        # por usuários
+        self.user_functions = {}
+        # Cria todas as funções pre-definidas
+        self.generate_predef()
 
     # for debug purposes
     def print_module(self):
@@ -150,6 +156,86 @@ class CodeGenerator:
         # Run the function via ctypes
         cfunc = CFUNCTYPE(None)(func_ptr)
         cfunc()
+
+    # Generate Predef functions - all functions are suposed double type
+    def generate_predef(self):
+        fnty = ir.FunctionType(double, [double])
+
+        # SIN
+        sin = ir.Function(self.module, fnty, "llvm.sin.f64")
+        block_sin = sin.append_basic_block(name="sin_block")
+        builder = ir.IRBuilder(sin.append_basic_block('block_sin'))
+        a = sin.args
+        result = builder.call(sin, a, name = "")
+        builder.ret(result)
+
+        # COS
+        cos = ir.Function(self.module, fnty, "llvm.cos.f64")
+        block_cos = cos.append_basic_block(name="cos_block")
+        builder = ir.IRBuilder(cos.append_basic_block('block_cos'))
+        a = cos.args
+        result = builder.call(sin, a, name = "")
+        builder.ret(result)
+
+        # TAN   
+        tan = ir.Function(self.module, fnty, name = "tan_func")
+        block_tan = tan.append_basic_block(name="tan_block")
+        builder = ir.IRBuilder(tan.append_basic_block('block_tan'))
+        a = tan.args
+        result1 = builder.call(sin, a, name = "")
+        result2 = builder.call(cos, a, name = "")
+        result3 = builder.udiv(result1, result2, name ="")
+        builder.ret(result3)
+
+        # EXP
+        exp = ir.Function(self.module, fnty, name="llvm.exp.f64")
+        block_exp = exp.append_basic_block(name="exp_block")
+        builder = ir.IRBuilder(exp.append_basic_block('block_exp'))
+        a = exp.args
+        result = builder.call(exp, a, name = "")
+        builder.ret(result)
+
+        # ABS
+        abs = ir.Function(self.module, fnty, name="llvm.fabs.f64")
+        block_abs = abs.append_basic_block(name="exp_abs")
+        builder = ir.IRBuilder(abs.append_basic_block('block_abs'))
+        a = abs.args
+        result = builder.call(abs, a, name = "")
+        builder.ret(result)
+
+        # LOG
+        log = ir.Function(self.module, fnty, name="llvm.log.f64")
+        block_log = log.append_basic_block(name="exp_block")
+        builder = ir.IRBuilder(log.append_basic_block('block_log'))
+        a = log.args
+        result = builder.call(log, a, name = "")
+        builder.ret(result)
+
+        # SQR
+        sqr = ir.Function(self.module, fnty, name="llvm.sqrt.f64")
+        block_sqr = sqr.append_basic_block(name="sqr_block")
+        builder = ir.IRBuilder(sqr.append_basic_block('block_sqr'))
+        a = sqr.args
+        result = builder.call(sqr, a, name = "")
+        builder.ret(result)
+
+        # # INT
+        # int_func = ir.Function(module, fnty, name="int_func")
+        # block_int_func = sin.append_basic_block(name="int_func_block")
+        # a = int_func.args
+        # # aproxima seno por serie de taylor
+        # a2 = builder.fadd() 
+        # result = a
+        # builder.ret(result)
+
+        # # RND
+        # rnd = ir.Function(module, fnty, name="rnd")
+        # block_rnd = sin.append_basic_block(name="rnd_block")
+        # a = rnd.args
+        # # aproxima seno por serie de taylor
+        # a2 = builder.fadd() 
+        # result = a
+        # builder.ret(result)
 
     def generate_code(self):
         self.print_module()

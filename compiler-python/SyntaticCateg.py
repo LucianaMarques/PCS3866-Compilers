@@ -28,17 +28,19 @@ class Parser():
         tokens2 = []
         i = 0
         while (i < len(self.tokens)):
-            if (self.tokens[i].key == 'FN'):
-                #print('FN')
-                tokens2.append(Token('COMPOSED', 'FN' + self.tokens[i+1].key))
-                i += 1
-            elif (self.tokens[i].key == 'GO'):
+            # if (self.tokens[i].key == 'FN'):
+            #     #print('FN')
+            #     tokens2.append(Token('COMPOSED', 'FN' + self.tokens[i+1].key))
+            #     i += 1
+            # elif (self.tokens[i].key == 'GO'):
+            if (self.tokens[i].key == 'GO'):
                 #print('GO')
                 tokens2.append(Token('COMPOSED', 'GOTO'))
                 i += 1
             elif (self.tokens[i].key == 'DEF'):
                 #print('DEF')
-                tokens2.append(Token('COMPOSED','DEF FN '+self.tokens[i+2].key))
+                tokens2.append(Token('COMPOSED','DEF FN '))
+                tokens2.append(Token(self.tokens[i+2].type, self.tokens[i+2].key))
                 i += 2
             elif (self.tokens[i].key == ">"):
                 #print('>')
@@ -52,6 +54,7 @@ class Parser():
     def syntax_categorize(self):
         i = 0
         while (i < len(self.tokens)):
+            print("TOKEN: ", self.tokens[i].type, self.tokens[i].key)
             proximo = self.next_state(i)
             i += proximo
     
@@ -62,6 +65,7 @@ class Parser():
             self.automaton_state.id = 1
 
         elif (self.automaton_state.id == 1):
+            self.codeGenerator.print_module()
             self.automaton_state.id = 2
 
         elif (self.automaton_state.id == 2):
@@ -72,7 +76,8 @@ class Parser():
             elif(self.check_data(i)):
                 pass
             elif(self.check_def(i)):
-                pass
+                self.automaton_state.id = 12
+                
             elif(self.check_dim(i)):
                 pass
             elif(self.check_for(i)):
@@ -105,12 +110,19 @@ class Parser():
         elif(self.automaton_state.id == 3):
             # self.variables.append((self.tokens[i].key,self.tokens[i+2].key))
             # print(self.tokens[i].key,self.tokens[i+2].key)
-            self.codeGenerator.generate_global_variable(self.tokens[i].key,int(self.tokens[i+1].key))
+            self.codeGenerator.generate_global_variable(self.tokens[i].key,int(self.tokens[i+2].key))
             proximo = 3
         
         # print an identifier's value
         elif(self.automaton_state.id == 8):
             self.codeGenerator.printf_id(self.tokens[i].key)
+
+        elif(self.automaton_state.id == 12):
+            # ex: DEF FN N(X)
+            name = self.tokens[i].key[0]
+            variable = self.tokens[i].key[2]
+            # assume-se tipo da função sempre DOUBLE
+            self.codeGenerator.generate_user_function(name,variable)
 
         return proximo
 
