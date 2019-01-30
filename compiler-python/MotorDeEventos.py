@@ -98,7 +98,7 @@ class MotorDeEventos():
         elif (e.type == "geracao_codigo"):
             print("CODIGO GERADO")
             # parser.generate_code()
-            self.add_event(Evento("fim"))
+            self.add_event(Evento("fim", ""))
         
         elif (e.type == "fim"):
             print("FIM DE COMPILAÇÃO")

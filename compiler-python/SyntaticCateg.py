@@ -1,3 +1,4 @@
+import math
 from CodeGenerator import CodeGenerator
 
 class SintaxAutomaton():
@@ -22,7 +23,10 @@ class Parser():
         self.codeGenerator = CodeGenerator()
 
         # global variable table
-        self.variables = []
+        self.variables = {}
+
+        # global function table
+        self.functions = {}
     
     def recategorize_tokens(self):
         tokens2 = []
@@ -54,7 +58,7 @@ class Parser():
     def syntax_categorize(self):
         i = 0
         while (i < len(self.tokens)):
-            print("TOKEN: ", self.tokens[i].type, self.tokens[i].key)
+            print("TOKEN: ", self.tokens[i].type, self.tokens[i].key, "ESTADO: ", self.automaton_state.id)
             proximo = self.next_state(i)
             i += proximo
     
@@ -109,7 +113,7 @@ class Parser():
         elif(self.automaton_state.id == 3):
             # self.variables.append((self.tokens[i].key,self.tokens[i+2].key))
             # print(self.tokens[i].key,self.tokens[i+2].key)
-            value = self.get_expression_value()
+            value = self.get_expression_value(i)
             self.codeGenerator.generate_global_variable(self.tokens[i].key,value)
             proximo = 3
         
@@ -122,9 +126,21 @@ class Parser():
             name = self.tokens[i].key[0]
             variable = self.tokens[i].key[2]
             # assume-se tipo da função sempre DOUBLE
-            self.codeGenerator.generate_user_function(name,variable)
+            proximo = self.generate_function(name, variable, i)
+            #self.codeGenerator.generate_user_function(name)
 
         return proximo
+    
+    # Cria a regra
+    def generate_function(self, name, variable, i):
+        tokens = []
+        while(self.tokens[i].type != 'EOL'):
+            tokens.append(self.tokens[i])
+            i += 1
+        # add the captured tokens
+        self.functions[name] = (variable,tokens)
+        # return the last position
+        return i
 
     def check_assign(self,i):
         if (self.tokens[i].key != 'LET'):
@@ -181,7 +197,7 @@ class Parser():
             return True
     
     def check_def(self,i):
-        if (self.tokens[i].key != 'DEF FN'):
+        if (self.tokens[i].key != 'DEF FN '):
             return False
         else:
             return True
@@ -210,21 +226,25 @@ class Parser():
         negative = 0
         operation = 0
         # verifica se é negativo
-        if (tokens[i].key == '-'):
-                negative = 1
-                proximo += 1
+        if (self.tokens[i].key == '-'):
+            negative = 1
+            proximo += 1
+        elif (self.tokens[i].key == '+'):
+            proximo += 1
         value = 0
-        while(tokens[proximo].type != EOL):
-            if (tokens[proximo].key == '+'):
+        while(self.tokens[proximo].type != 'EOL'):
+            if (self.tokens[proximo].key == '+'):
                 operation = 1
-            elif(tokens[proximo].key == '-'):
+            elif(self.tokens[proximo].key == '-'):
                 operation = 2
-            elif (tokens[proximo].key == '*'):
+            elif (self.tokens[proximo].key == '*'):
                 operation = 3
-            elif(tokens[proximo].key == '/'):
+            elif(self.tokens[proximo].key == '/'):
                 operation = 4
             else:
-                eb = self.check_eb()
+                if (operation != 0):
+                    i += 1
+                eb = self.check_eb(i)
                 if (operation == 0):
                     value = eb
                     if negative:
@@ -242,28 +262,32 @@ class Parser():
 
     def check_eb(self, i):
         # verifica se é número
-        if(self.tokens[i].type == INT):
-            return int(self.tokens[i].char)
+        if(self.tokens[i].type == 'INT'):
+            return int(self.tokens[i].key)
         # varifica se é variável global
-        elif(self.tokens[i].type == CHARACTER):
-            if (self.tokens[i].key in self.variables):
-                return int(self.variables[tokens[i].key])
-            elif (self.tokens[i].char == "FN"):
+        elif(self.tokens[i].type == 'CHARACTER'):
+            if (self.tokens[i].key == "FN"):
                 return self.calculate_function(i)
-        elif(tokens[i].type == RESERVED):
+            elif (self.tokens[i].key in self.variables):
+                return int(self.variables[tokens[i].key])
+        elif(self.tokens[i].type == 'RESERVED'):
             # manda uma flag para o codeGenerator
-            if (tokens[i].key == "SIN"):
+            if (self.tokens[i].key == "SIN"):
+                variable = self.tokens[i+1].key[1]
+                print(variable)
+            elif (self.tokens[i].key == "COS"):
                 pass
-            elif (tokens[i].key == "COS"):
+            elif (self.tokens[i].key == "TAN"):
                 pass
-            elif (tokens[i].key == "TAN"):
+            elif (self.tokens[i].key == "EXP"):
                 pass
-            elif (tokens[i].key == "EXP"):
+            elif (self.tokens[i].key == "ABS"):
                 pass
-            elif (tokens[i].key == "ABS"):
+            elif (self.tokens[i].key == "LOG"):
                 pass
-            elif (tokens[i].key == "LOG"):
-                pass
-            elif (tokens[i].key == "SQR"):
+            elif (self.tokens[i].key == "SQR"):
                 pass
         return 0
+
+    def calculate_function(self, i):
+        pass

@@ -115,7 +115,14 @@ class CodeGenerator:
 
     # adds a programmer-defined function
     def generate_user_function(self, func_name):
-        pass
+        # append generic block with func_name
+        fnty = ir.FunctionType(double, [double])
+        func = ir.Function(self.module, fnty, name = func_name)
+        block_name = func_name + "_block"
+        block_func = func.append_basic_block(name=block_name)
+        builder = ir.IRBuilder(func.append_basic_block(block_func))
+        x = func.arg
+        
     
     def printf_id(self, name):
         func_ty = ir.FunctionType(ir.VoidType(), [])
