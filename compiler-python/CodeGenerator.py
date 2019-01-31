@@ -158,14 +158,14 @@ class CodeGenerator:
         builder.ret_void()
 
         llvm_ir = str(self.module)
-        engine = create_execution_engine()
-        print(self.module)
-        mod = compile_ir(engine, llvm_ir)
-        # Look up the function pointer (a Python int)
-        func_ptr = engine.get_function_address("printer")
-        # Run the function via ctypes
-        cfunc = CFUNCTYPE(None)(func_ptr)
-        cfunc()
+        # engine = create_execution_engine()
+        # print(self.module)
+        # mod = compile_ir(engine, llvm_ir)
+        # # Look up the function pointer (a Python int)
+        # func_ptr = engine.get_function_address("printer")
+        # # Run the function via ctypes
+        # cfunc = CFUNCTYPE(None)(func_ptr)
+        # cfunc()
 
     # Generate Predef functions - all functions are suposed double type
     def sin(self,a):

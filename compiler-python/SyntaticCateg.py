@@ -75,13 +75,7 @@ class Parser():
         elif (self.automaton_state.id == 2):
             # create a new variable and assign it its value
             if (self.check_assign(i)):
-                # check if function
-                if (self.tokens[i+3].key == 'FN '):
-                    print("hi3")
-                    self.automaton_state.id = 12
-                else:
-                    self.automaton_state.id = 3
-                #check if value
+                self.check_expression(i+2)
 
             elif(self.check_data(i)):
                 pass
@@ -136,8 +130,18 @@ class Parser():
             proximo = self.generate_function(name, variable, i)
             self.automaton_state.id = 1
 
+        elif(self.automaton_state.id == 13):
+            pass
+
         return proximo
     
+    def check_expression(i):
+        # check if function
+        if (self.tokens[i].key == 'FN '):
+            self.calculate_function()
+        else:
+            pass
+
     # Cria a regra
     def generate_function(self, name, variable, i):
         print("GENERATE FUNCTION")
@@ -230,6 +234,7 @@ class Parser():
         else:
             return True
 
+    # Rename it after
     def get_expression_value(self, i):
         proximo = i
         negative = 0

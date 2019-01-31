@@ -1,11 +1,5 @@
 from SyntaticCateg import Token
 
-# global variables for automaton states
-IDENTIFIER = 3
-CHARACTER = 4
-INT = 7
-NUM = 13
-
 class AsciiCharacter():
     def __init__(self, t, c):
         self.char = c
@@ -94,13 +88,16 @@ class LexerCategorizer:
                     if (i!= len(self.characters) - 1):
                         reserved, extra = self.check_reserved(i)
                     else:
-                        reserved = False
+                        #reserved = False
                         extra = ''
                     #print(reserved)
                     if (not reserved):
+                        # Identifier
                         if (self.characters[i+1].type == "digit"):
                             self.automaton_state.id = 3
                         else:
+                            self.generate_token("CHARACTER", self.characters[i].char)
+                            self.automaton_state.read = ""
                             self.automaton_state.id = 4
                     else:
                         self.automaton_state.read = self.automaton_state.read + extra
