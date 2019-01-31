@@ -158,10 +158,10 @@ class CodeGenerator:
 
         llvm_ir = str(self.module)
         engine = create_execution_engine()
+        print(self.module)
         mod = compile_ir(engine, llvm_ir)
         # Look up the function pointer (a Python int)
         func_ptr = engine.get_function_address("printer")
-
         # Run the function via ctypes
         cfunc = CFUNCTYPE(None)(func_ptr)
         cfunc()
@@ -172,15 +172,14 @@ class CodeGenerator:
 
         # SIN
         sin = ir.Function(self.module, fnty, "llvm.sin.f64")
-        block_sin = sin.append_basic_block(name="sin_block")
-        builder = ir.IRBuilder(sin.append_basic_block('block_sin'))
+        #block_sin = sin.append_basic_block(name="sin_block")
+        builder = ir.IRBuilder(sin.append_basic_block('sin_block'))
         a = sin.args
         result = builder.call(sin, a, name = "")
         builder.ret(result)
 
         # COS
         cos = ir.Function(self.module, fnty, "llvm.cos.f64")
-        block_cos = cos.append_basic_block(name="cos_block")
         builder = ir.IRBuilder(cos.append_basic_block('block_cos'))
         a = cos.args
         result = builder.call(sin, a, name = "")
@@ -188,7 +187,6 @@ class CodeGenerator:
 
         # TAN   
         tan = ir.Function(self.module, fnty, name = "tan_func")
-        block_tan = tan.append_basic_block(name="tan_block")
         builder = ir.IRBuilder(tan.append_basic_block('block_tan'))
         a = tan.args
         result1 = builder.call(sin, a, name = "")
@@ -198,7 +196,6 @@ class CodeGenerator:
 
         # EXP
         exp = ir.Function(self.module, fnty, name="llvm.exp.f64")
-        block_exp = exp.append_basic_block(name="exp_block")
         builder = ir.IRBuilder(exp.append_basic_block('block_exp'))
         a = exp.args
         result = builder.call(exp, a, name = "")
@@ -206,7 +203,6 @@ class CodeGenerator:
 
         # ABS
         abs = ir.Function(self.module, fnty, name="llvm.fabs.f64")
-        block_abs = abs.append_basic_block(name="exp_abs")
         builder = ir.IRBuilder(abs.append_basic_block('block_abs'))
         a = abs.args
         result = builder.call(abs, a, name = "")
@@ -214,7 +210,6 @@ class CodeGenerator:
 
         # LOG
         log = ir.Function(self.module, fnty, name="llvm.log.f64")
-        block_log = log.append_basic_block(name="exp_block")
         builder = ir.IRBuilder(log.append_basic_block('block_log'))
         a = log.args
         result = builder.call(log, a, name = "")
@@ -222,7 +217,6 @@ class CodeGenerator:
 
         # SQR
         sqr = ir.Function(self.module, fnty, name="llvm.sqrt.f64")
-        block_sqr = sqr.append_basic_block(name="sqr_block")
         builder = ir.IRBuilder(sqr.append_basic_block('block_sqr'))
         a = sqr.args
         result = builder.call(sqr, a, name = "")

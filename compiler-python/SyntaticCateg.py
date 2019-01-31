@@ -75,7 +75,13 @@ class Parser():
         elif (self.automaton_state.id == 2):
             # create a new variable and assign it its value
             if (self.check_assign(i)):
-                self.automaton_state.id = 3
+                # check if function
+                if (self.tokens[i+3].key == 'FN '):
+                    print("hi3")
+                    self.automaton_state.id = 12
+                else:
+                    self.automaton_state.id = 3
+                #check if value
 
             elif(self.check_data(i)):
                 pass
@@ -128,6 +134,7 @@ class Parser():
             variable = self.tokens[i].key[2]
             # assume-se tipo da função sempre DOUBLE
             proximo = self.generate_function(name, variable, i)
+            self.automaton_state.id = 1
 
         return proximo
     
@@ -142,7 +149,7 @@ class Parser():
         # add the captured tokens
         self.functions[name] = (variable,tokens)
         # return the last position
-        return i
+        return i-1
 
     def check_assign(self,i):
         if (self.tokens[i].key != 'LET'):
