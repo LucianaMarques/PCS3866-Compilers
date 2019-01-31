@@ -39,134 +39,195 @@ class LexerCategorizer:
             # print("estado: ", self.automaton_state.id)
             i += proximo
 
+    # def next_state(self,i):
+    #     proximo = 1
+    #     # if we found an "EOL" on the diagram
+    #     if (self.characters[i].type == "descartavel" or self.characters[i].type == "controle"):
+    #         if (self.automaton_state.id == 3):
+    #             self.generate_token("IDENTIFIER", self.automaton_state.read)
+    #             # Adds an EOL token in case it's the end of a line
+    #             if (self.characters[i].type == "controle"):
+    #                 self.generate_token("EOL", "")
+    #         elif (self.automaton_state.id == 4):
+    #             self.generate_token("CHARACTER", self.automaton_state.read)
+    #             # Adds an EOL token in case it's the end of a line
+    #             if (self.characters[i].type == "controle"):
+    #                 self.generate_token("EOL", "")
+    #         elif (self.automaton_state.id == 7):
+    #             self.generate_token("INT", self.automaton_state.read)
+    #             # Adds an EOL token in case it's the end of a line
+    #             if (self.characters[i].type == "controle"):
+    #                 self.generate_token("EOL", "")
+    #         elif (self.automaton_state.id == 13):
+    #             if (self.automaton_state.read[0] == '+' or self.automaton_state.read[0] == "-"):
+    #                 self.generate_token("SNUM", self.automaton_state.read)
+    #                 # Adds an EOL token in case it's the end of a line
+    #                 if (self.characters[i].type == "controle"):
+    #                     self.generate_token("EOL", "")
+    #             else:
+    #                 self.generate_token("NUM", self.automaton_state.read)
+    #                 # Adds an EOL token in case it's the end of a line
+    #                 if (self.characters[i].type == "controle"):
+    #                     self.generate_token("EOL", "")
+    #         elif (self.automaton_state.id == 18):
+    #             self.generate_token("RESERVED", self.automaton_state.read) 
+    #             # Adds an EOL token in case it's the end of a line
+    #             if (self.characters[i].type == "controle"):
+    #                 self.generate_token("EOL", "")   
+            
+    #         # Goes back to the beginning
+    #         self.automaton_state.id = 1
+    #         self.automaton_state.read = ""
+
+    #     # if current state is 1 in the diagram
+    #     else:
+    #         #self.automaton_state.read = self.automaton_state.read + self.characters[i].char
+    #         self.automaton_state.read = self.characters[i].char
+    #         # print(self.automaton_state.read)
+    #         if (self.automaton_state.id == 1):
+    #             if (self.characters[i].type == "letter"):
+    #                 # check if end of characters
+    #                 if (i != len(self.characters) - 1):
+    #                     reserved, extra = self.check_reserved(i)
+    #                 # if end of characters, no way that it's reserved
+    #                 else:
+    #                     reserved = False
+    #                     extra = ''
+    #                 #print(reserved)
+    #                 if (not reserved):
+    #                     # Identifier
+    #                     if (self.characters[i+1].type == "digit"):
+    #                         self.automaton_state.id = 3
+    #                     else:
+    #                         self.generate_token("CHARACTER", self.characters[i].char)
+    #                         self.automaton_state.read = ""
+    #                         self.automaton_state.id = 1
+    #                 else:
+    #                     self.automaton_state.read = self.automaton_state.read + extra
+    #                     self.automaton_state.id = 18
+    #                     proximo = len(extra) + 1
+
+    #             elif (self.characters[i].type == "digit"):
+    #                 if (self.characters[i+1].type == "descartavel" or self.characters[i+1].type == "controle"):
+    #                     self.automaton_state.id = 7
+    #                 else:
+    #                     self.automaton_state.id = 6
+    #                 # self.automaton_state.id = 4
+    #                 # could be 4, check it out later
+    #             elif (self.characters[i].type == "special"):
+    #                 self.generate_token("CHARACTER", self.characters[i].char)
+    #                 self.automaton_state.read = ""
+    #                 #self.automaton_state.id = 4
+    #                 self.automaton_state.id = 1
+    #             elif (self.characters[i].char == "+" or self.characters[i].char == "-"):
+    #                 self.automaton_state.id = 5
+    #             elif (self.characters[i].char == "."):
+    #                 self.automaton_state.id = 6
+    #             else:
+    #                 self.automaton_state.id = 6
+
+    #         elif (self.automaton_state.id == 5):
+    #             self.automaton_state.id = 6
+            
+    #         elif (self.automaton_state.id == 6):
+    #             self.automaton_state.id = 7
+            
+    #         elif (self.automaton_state.id == 7):
+    #             if (self.characters[i+1].type == "digit"):
+    #                 self.automaton_state.id = 7
+    #             if (self.characters[i+1].type == "descartavel"):
+    #                 self.automaton_state.id = 7
+    #             elif (self.characters[i+1].char == "."):
+    #                 self.automaton_state.id = 8
+    #             else:
+    #                 self.automaton_state.id = 9
+            
+    #         elif (self.automaton_state.id == 8):
+    #             if (self.characters[i+1].type == "digit"):
+    #                 pass
+    #             else:
+    #                 self.automaton_state.id = 9
+            
+    #         elif (self.automaton_state.id == 9):
+    #             if (self.characters[i+1].char == "E"):
+    #                 self.automaton_state.id = 10
+    #             else:
+    #                 self.automaton_state.id = 13
+            
+    #         elif (self.automaton_state.id == 10):
+    #             self.automaton_state.id = 11
+
+    #         elif (self.automaton_state.id == 11):
+    #             self.automaton_state.id = 12
+            
+    #         elif (self.automaton_state.id == 12):
+    #             if (self.characters[i+1].type == "digit"):
+    #                 pass
+    #             else:
+    #                 self.automaton_state.id = 13
+            
+    #         else:
+    #             pass
+        
+    #     return proximo
+
     def next_state(self,i):
         proximo = 1
-        # if we found an "EOL" on the diagram
-        if (self.characters[i].type == "descartavel" or self.characters[i].type == "controle"):
-            if (self.automaton_state.id == 3):
-                self.generate_token("IDENTIFIER", self.automaton_state.read)
-                # Adds an EOL token in case it's the end of a line
-                if (self.characters[i].type == "controle"):
-                    self.generate_token("EOL", "")
-            elif (self.automaton_state.id == 4):
-                self.generate_token("CHARACTER", self.automaton_state.read)
-                # Adds an EOL token in case it's the end of a line
-                if (self.characters[i].type == "controle"):
-                    self.generate_token("EOL", "")
-            elif (self.automaton_state.id == 7):
-                self.generate_token("INT", self.automaton_state.read)
-                # Adds an EOL token in case it's the end of a line
-                if (self.characters[i].type == "controle"):
-                    self.generate_token("EOL", "")
-            elif (self.automaton_state.id == 13):
-                if (self.automaton_state.read[0] == '+' or self.automaton_state.read[0] == "-"):
-                    self.generate_token("SNUM", self.automaton_state.read)
-                    # Adds an EOL token in case it's the end of a line
-                    if (self.characters[i].type == "controle"):
-                        self.generate_token("EOL", "")
+        self.automaton_state.read = self.automaton_state.read + self.characters[i].char
+        print(self.automaton_state.read)
+        if (self.automaton_state.id == 1):
+            if (self.characters[i].type == "letter"):
+                # check if end of characters
+                if (i != len(self.characters) - 1):
+                    reserved, extra = self.check_reserved(i)
+                # if end of characters, no way that it's reserved
                 else:
-                    self.generate_token("NUM", self.automaton_state.read)
-                    # Adds an EOL token in case it's the end of a line
-                    if (self.characters[i].type == "controle"):
-                        self.generate_token("EOL", "")
-            elif (self.automaton_state.id == 18):
-                self.generate_token("RESERVED", self.automaton_state.read) 
-                # Adds an EOL token in case it's the end of a line
-                if (self.characters[i].type == "controle"):
-                    self.generate_token("EOL", "")   
-            
-            # Goes back to the beginning
-            self.automaton_state.id = 1
-            self.automaton_state.read = ""
-
-        # if current state is 1 in the diagram
-        else:
-            #self.automaton_state.read = self.automaton_state.read + self.characters[i].char
-            self.automaton_state.read = self.characters[i].char
-            # print(self.automaton_state.read)
-            if (self.automaton_state.id == 1):
-                if (self.characters[i].type == "letter"):
-                    if (i!= len(self.characters) - 1):
-                        reserved, extra = self.check_reserved(i)
+                    reserved = False
+                    extra = ''
+                if (not reserved):
+                    # Identifier
+                    if (self.characters[i+1].type == "digit"):
+                        self.generate_token("IDENTIFIER", self.automaton_state.read)
+                        proximo = 2
+                        self.automaton_state.read = ""
+                        self.automaton_state.id = 1
                     else:
-                        #reserved = False
-                        extra = ''
-                    #print(reserved)
-                    if (not reserved):
-                        # Identifier
-                        if (self.characters[i+1].type == "digit"):
-                            self.automaton_state.id = 3
-                        else:
-                            self.generate_token("CHARACTER", self.characters[i].char)
-                            self.automaton_state.read = ""
-                            self.automaton_state.id = 4
-                    else:
-                        self.automaton_state.read = self.automaton_state.read + extra
-                        self.automaton_state.id = 18
-                        proximo = len(extra) + 1
-
-                elif (self.characters[i].type == "digit"):
-                    if (self.characters[i+1].type == "descartavel" or self.characters[i+1].type == "controle"):
-                        self.automaton_state.id = 7
-                    else:
-                        self.automaton_state.id = 6
-                    # self.automaton_state.id = 4
-                    # could be 4, check it out later
-                elif (self.characters[i].type == "special"):
-                    self.generate_token("CHARACTER", self.characters[i].char)
+                        self.generate_token("CHARACTER", self.characters[i].char)
+                        self.automaton_state.read = ""
+                        self.automaton_state.id = 1
+                else:
+                    self.automaton_state.read = self.automaton_state.read + extra
+                    self.generate_token("RESERVERD", self.automaton_state.read)
                     self.automaton_state.read = ""
-                    #self.automaton_state.id = 4
                     self.automaton_state.id = 1
-                elif (self.characters[i].char == "+" or self.characters[i].char == "-"):
-                    self.automaton_state.id = 5
-                elif (self.characters[i].char == "."):
-                    self.automaton_state.id = 6
-                else:
-                    self.automaton_state.id = 6
+                    proximo = len(extra) + 1
 
-            elif (self.automaton_state.id == 5):
-                self.automaton_state.id = 6
+            elif (self.characters[i].type == "special"):
+                self.generate_token("CHARACTER",self.characters[i].char)
+
+            elif (self.characters[i].type == "digit"):
+                # if it's a one digit number
+                if (self.characters[i+1].type != "digit"):
+                    self.generate_token("INT",self.characters[i+1].char)
+                # if it's a number with more than one digit
+                else:
+                    self.automaton_state.id = 7
+
+            elif (self.characters[i].type == "controle"):
+                self.generate_token("EOL", "")
             
-            elif (self.automaton_state.id == 6):
+            elif (self.characters[i].type == "descartavel"):
+                self.automaton_state.read = ""
+
+        elif (self.automaton_state.id == 7):
+            if (self.characters[i].type == "digit"):
                 self.automaton_state.id = 7
-            
-            elif (self.automaton_state.id == 7):
-                if (self.characters[i+1].type == "digit"):
-                    self.automaton_state.id = 7
-                if (self.characters[i+1].type == "descartavel"):
-                    self.automaton_state.id = 7
-                elif (self.characters[i+1].char == "."):
-                    self.automaton_state.id = 8
-                else:
-                    self.automaton_state.id = 9
-            
-            elif (self.automaton_state.id == 8):
-                if (self.characters[i+1].type == "digit"):
-                    pass
-                else:
-                    self.automaton_state.id = 9
-            
-            elif (self.automaton_state.id == 9):
-                if (self.characters[i+1].char == "E"):
-                    self.automaton_state.id = 10
-                else:
-                    self.automaton_state.id = 13
-            
-            elif (self.automaton_state.id == 10):
-                self.automaton_state.id = 11
-
-            elif (self.automaton_state.id == 11):
-                self.automaton_state.id = 12
-            
-            elif (self.automaton_state.id == 12):
-                if (self.characters[i+1].type == "digit"):
-                    pass
-                else:
-                    self.automaton_state.id = 13
-            
-            else:
-                pass
-        
+            elif (self.characters[i].type == "descartavel" or self.characters[i].type == "controle"):
+                self.generate_token("INT", self.characters[i].char)
+                self.automaton_state.id = 1
+                self.automaton_state.read = ""
+                if (self.characters[i].type == "controle"):
+                    self.generate_token("EOL", "")
         return proximo
       
     # Check for RESERVED type token

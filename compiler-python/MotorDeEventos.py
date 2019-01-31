@@ -68,7 +68,7 @@ class MotorDeEventos():
             print("CLASSIFICAÇÃO LÉXICA")
             for char in self.characters:
                 char.classify_ascii_char()
-                print(char.char," ",char.type)
+                #print(char.char," ",char.type)
             self.add_event(Evento("extrair_tokens", self.tokens))
 
         elif (e.type == "extrair_tokens"):
