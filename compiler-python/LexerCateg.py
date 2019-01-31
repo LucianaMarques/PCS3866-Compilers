@@ -172,6 +172,7 @@ class LexerCategorizer:
     #     return proximo
 
     def next_state(self,i):
+        print("ESTADO: ", self.automaton_state.id)
         proximo = 1
         self.automaton_state.read = self.automaton_state.read + self.characters[i].char
         print(self.automaton_state.read)
@@ -203,13 +204,25 @@ class LexerCategorizer:
                     proximo = len(extra) + 1
 
             elif (self.characters[i].type == "special"):
-                self.generate_token("CHARACTER",self.characters[i].char)
+                if (self.characters[i].char == "+" or self.characters[i].char == "-"):
+                    if (self.characters[i+1].type == "digit"):
+                        self.automaton_state.id = 5
+                    else:
+                        self.generate_token("CHARACTER", self.automaton_state.read)
+                        self.automaton_state.id = 1
+                        self.automaton_state.read = ""
+                elif (self.characters[i].char == "."):
+                    self.automaton_state.id = 6
+                else:
+                    self.generate_token("CHARACTER",self.characters[i].char)
+                    self.automaton_state.id = 1
+                    self.automaton_state.read = ""
 
             elif (self.characters[i].type == "digit"):
-                # if it's a one digit number
-                if (self.characters[i+1].type != "digit"):
-                    self.generate_token("INT",self.characters[i+1].char)
-                # if it's a number with more than one digit
+                if (self.characters[i+1].type != "digit" and self.characters[i+1].char != "." and self.characters[i+1].char != "E"):
+                    self.generate_token("INT", self.automaton_state.read)
+                    self.automaton_state.id = 1
+                    self.automaton_state.read = ""
                 else:
                     self.automaton_state.id = 7
 
@@ -218,6 +231,12 @@ class LexerCategorizer:
             
             elif (self.characters[i].type == "descartavel"):
                 self.automaton_state.read = ""
+
+        elif (self.automaton_state.id == 5):
+            self.automaton_state.id = 6
+        
+        elif (self.automaton_state.id == 6):
+            self.automaton_state.id == 7
 
         elif (self.automaton_state.id == 7):
             if (self.characters[i].type == "digit"):
@@ -228,6 +247,42 @@ class LexerCategorizer:
                 self.automaton_state.read = ""
                 if (self.characters[i].type == "controle"):
                     self.generate_token("EOL", "")
+            elif(self.characters[i].char == "."):
+                self.automaton_state.id = 8
+            else:
+                self.automaton_state.id = 9
+        
+        elif(self.automaton_state.id == 8):
+            if (self.characters[i+1].type == "digit"):
+                self.automaton_state.id = 8
+            elif (self.characters[i].char == "E"):
+                self.automaton_state.id = 9
+            else:
+                if (self.automaton_state.read[0] == "+" or self.automaton_state.read[0] == "-"):
+                    self.generate_token("SNUM", self.automaton_state.read)
+                else:
+                    self.generate_token("NUM", self.automaton_state.read)
+                self.automaton_state.id = 1
+                self.automaton_state.read = ""
+        
+        elif(self.automaton_state.id == 9):
+            if (self.characters[i].char == "E"):
+                j = i
+                if (self.characters[i+1].char[0] == "+" or self.characters[i+1].char[0] == "-"):
+                    self.automaton_state.read = self.automaton_state.read + self.characters[i].char
+                    j += 2
+                else:
+                    j += 1
+                while (self.characters[j].type == "digit"):
+                    self.automaton_state.read = self.automaton_state.read + self.characters[i].char
+                    j += 1
+                proximo = j - i
+            if (self.automaton_state.read[0] == "+" or self.automaton_state.read[0] == "-"):
+                self.generate_token("SNUM", self.automaton_state.read)
+            else:
+                self.generate_token("NUM", self.automaton_state.read)
+            self.automaton_state.id = 1
+            self.automaton_state.read = ""
         return proximo
       
     # Check for RESERVED type token
