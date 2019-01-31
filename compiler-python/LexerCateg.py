@@ -81,7 +81,8 @@ class LexerCategorizer:
 
         # if current state is 1 in the diagram
         else:
-            self.automaton_state.read = self.automaton_state.read + self.characters[i].char
+            #self.automaton_state.read = self.automaton_state.read + self.characters[i].char
+            self.automaton_state.read = self.characters[i].char
             # print(self.automaton_state.read)
             if (self.automaton_state.id == 1):
                 if (self.characters[i].type == "letter"):
@@ -112,7 +113,10 @@ class LexerCategorizer:
                     # self.automaton_state.id = 4
                     # could be 4, check it out later
                 elif (self.characters[i].type == "special"):
-                    self.automaton_state.id = 4
+                    self.generate_token("CHARACTER", self.characters[i].char)
+                    self.automaton_state.read = ""
+                    #self.automaton_state.id = 4
+                    self.automaton_state.id = 1
                 elif (self.characters[i].char == "+" or self.characters[i].char == "-"):
                     self.automaton_state.id = 5
                 elif (self.characters[i].char == "."):
