@@ -22,12 +22,23 @@ class Parser():
         self.automaton_state = SintaxAutomaton()
         self.codeGenerator = CodeGenerator()
 
+        # current token none by default
+        self.current_token = None
+        self.current_token_id = 0
+
         # global variable table
         self.variables = {}
 
         # global function table
         self.functions = {}
     
+    def initialize_tokens(self):
+        self.current_token = self.tokens[0]
+
+    def extract_token(self):
+        self.current_token_id += 1
+        self.current_token = self.tokens[current_token_id]
+
     def recategorize_tokens(self):
         tokens2 = []
         i = 0
@@ -63,77 +74,134 @@ class Parser():
             i += proximo
             print(i)
     
-    def next_state(self, i):
-        proximo = 1
+    def syntax_extraction(self):
+        while (self.current_token_id < len(self.tokens)):
+            print("TOKEN: ", self.current_token.type, self.current_token.key, "ESTADO: ", self.automaton_state.id)
+            self.next_state()
 
-        if (self.tokens[i].type == "EOL"):
+    def next_state(self):
+        if (self.current_token.type == "EOL"):
             self.automaton_state.id = 1
 
-        elif (self.automaton_state.id == 1):
-            self.automaton_state.id = 2
-
-        elif (self.automaton_state.id == 2):
-            # create a new variable and assign it its value
-            if (self.check_assign(i)):
-                self.check_expression(i+2)
-
-            elif(self.check_data(i)):
-                pass
-            elif(self.check_def(i)):
-                self.automaton_state.id = 12
-                
-            elif(self.check_dim(i)):
-                pass
-            elif(self.check_for(i)):
-                pass
-            elif(self.check_gosub(i)):
-                pass
-            elif(self.check_goto(i)):
-                pass
-            elif(self.check_if(i)):
-                pass
-            elif(self.check_next(i)):
-                pass
-            elif(self.check_print(i)):
-                self.automaton_state.id = 8
-
-            elif(self.check_read(i)):
-                pass
-            
-            # Do not make anything when REM
-            elif(self.check_rem(i)):
-                j = i
-                while(self.tokens[j].type!='EOL'):
-                    j += 1
-                proximo = j - i
-            
-            elif(self.check_end(i)):
-                self.codeGenerator.generate_code()
+        elif(self.current_token.type == "INT"):
+            if (self.automaton_state.id == 1):
+                self.automaton_state.id = 2
+                self.extract_token()
         
-        # add a new variable to the global variables' table
-        elif(self.automaton_state.id == 3):
-            # self.variables.append((self.tokens[i].key,self.tokens[i+2].key))
-            # print(self.tokens[i].key,self.tokens[i+2].key)
-            value = self.get_expression_value(i)
-            self.codeGenerator.generate_global_variable(self.tokens[i].key,value)
-            proximo = 3
+        elif(self.current_token.type == "RESERVED"):
+            if (self.current_token.key == "LET"):
+                pass
+            elif (self.current_token.key == "PRINT"):
+                pass
+            elif (self.current_token.key == "DATA"):
+                pass
+            elif (self.current_token.key == "GOTO"):
+                pass
+            elif (self.current_token.key == "IF"):
+                pass
+            elif (self.current_token.key == "FOR"):
+                pass
+            elif (self.current_token.key == "NEXT"):
+                pass
+            elif (self.current_token.key == "DIM"):
+                pass
+            elif (self.current_token.key == "GOSUB"):
+                pass
+            elif (self.current_token.key == "REM"):
+                pass
+            elif (self.current_token.key == "END"):
+                pass
+
+        elif(self.current_token.type == "COMPOSED"):
+            elif(self.current_token.key == "DEF FN"):
+                pass
         
-        # print an identifier's value
-        elif(self.automaton_state.id == 8):
-            self.codeGenerator.printf_id(self.tokens[i].key)
-
-        elif(self.automaton_state.id == 12):
-            # ex: DEF FN N(X)
-            name = self.tokens[i].key[0]
-            variable = self.tokens[i].key[2]
-            # assume-se tipo da função sempre DOUBLE
-            proximo = self.generate_function(name, variable, i)
-            self.automaton_state.id = 1
-
-        elif(self.automaton_state.id == 13):
+        elif(self.current_token.type == "CHARACTER"):
             pass
 
-        return proximo
+        elif(self.current_token.type == "NUM"):
+            pass
+
+        elif(self.current_token.type == "SNUM"):
+            pass
+        
+        elif(self.current_token.type == "IDENTIFIER"):
+            pass
+        
+        self.extract_token()
+
+
+    # def next_state(self, i):
+    #     proximo = 1
+
+    #     if (self.tokens[i].type == "EOL"):
+    #         self.automaton_state.id = 1
+
+    #     elif (self.automaton_state.id == 1):
+    #         self.automaton_state.id = 2
+
+    #     elif (self.automaton_state.id == 2):
+    #         # create a new variable and assign it its value
+    #         if (self.check_assign(i)):
+    #             self.check_expression(i+2)
+
+    #         elif(self.check_data(i)):
+    #             pass
+    #         elif(self.check_def(i)):
+    #             self.automaton_state.id = 12
+                
+    #         elif(self.check_dim(i)):
+    #             pass
+    #         elif(self.check_for(i)):
+    #             pass
+    #         elif(self.check_gosub(i)):
+    #             pass
+    #         elif(self.check_goto(i)):
+    #             pass
+    #         elif(self.check_if(i)):
+    #             pass
+    #         elif(self.check_next(i)):
+    #             pass
+    #         elif(self.check_print(i)):
+    #             self.automaton_state.id = 8
+
+    #         elif(self.check_read(i)):
+    #             pass
+            
+    #         # Do not make anything when REM
+    #         elif(self.check_rem(i)):
+    #             j = i
+    #             while(self.tokens[j].type!='EOL'):
+    #                 j += 1
+    #             proximo = j - i
+            
+    #         elif(self.check_end(i)):
+    #             self.codeGenerator.generate_code()
+        
+    #     # add a new variable to the global variables' table
+    #     elif(self.automaton_state.id == 3):
+    #         # self.variables.append((self.tokens[i].key,self.tokens[i+2].key))
+    #         # print(self.tokens[i].key,self.tokens[i+2].key)
+    #         value = self.get_expression_value(i)
+    #         self.codeGenerator.generate_global_variable(self.tokens[i].key,value)
+    #         proximo = 3
+        
+    #     # print an identifier's value
+    #     elif(self.automaton_state.id == 8):
+    #         self.codeGenerator.printf_id(self.tokens[i].key)
+
+    #     elif(self.automaton_state.id == 12):
+    #         # ex: DEF FN N(X)
+    #         name = self.tokens[i].key[0]
+    #         variable = self.tokens[i].key[2]
+    #         # assume-se tipo da função sempre DOUBLE
+    #         proximo = self.generate_function(name, variable, i)
+    #         self.automaton_state.id = 1
+
+    #     elif(self.automaton_state.id == 13):
+    #         pass
+
+    #     return proximo
     
     def check_expression(i):
         # check if function

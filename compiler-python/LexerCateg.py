@@ -172,10 +172,10 @@ class LexerCategorizer:
     #     return proximo
 
     def next_state(self,i):
-        print("ESTADO: ", self.automaton_state.id)
+        #print("ESTADO: ", self.automaton_state.id)
         proximo = 1
         self.automaton_state.read = self.automaton_state.read + self.characters[i].char
-        print(self.automaton_state.read)
+        #print(self.automaton_state.read)
         if (self.automaton_state.id == 1):
             if (self.characters[i].type == "letter"):
                 # check if end of characters

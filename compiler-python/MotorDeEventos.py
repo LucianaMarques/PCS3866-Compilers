@@ -86,13 +86,15 @@ class MotorDeEventos():
             print("RECATEGORIZAR TOKENS")
             parser.tokens = e.value
             parser.recategorize_tokens()
+            parser.initialize_tokens()
             for token in parser.tokens:
                 print("Token: ",token.type,token.key)
             self.add_event(Evento("extrair_sintaxes", parser))
         
         elif (e.type == "extrair_sintaxes"):
             print("EXTRAÇÃO DE SINTAXES")
-            parser.syntax_categorize()
+            #parser.syntax_categorize()
+            parser.syntax_extraction()
             self.add_event(Evento("geracao_codigo", parser.sintaxes))
         
         elif (e.type == "geracao_codigo"):
