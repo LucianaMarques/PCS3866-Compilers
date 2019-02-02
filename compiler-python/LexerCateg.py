@@ -198,7 +198,7 @@ class LexerCategorizer:
                         self.automaton_state.id = 1
                 else:
                     self.automaton_state.read = self.automaton_state.read + extra
-                    self.generate_token("RESERVERD", self.automaton_state.read)
+                    self.generate_token("RESERVED", self.automaton_state.read)
                     self.automaton_state.read = ""
                     self.automaton_state.id = 1
                     proximo = len(extra) + 1

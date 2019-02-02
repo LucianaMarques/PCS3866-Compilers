@@ -86,7 +86,7 @@ class MotorDeEventos():
             print("RECATEGORIZAR TOKENS")
             parser.tokens = e.value
             parser.recategorize_tokens()
-            parser.initialize_tokens()
+            # parser.initialize_tokens()
             for token in parser.tokens:
                 print("Token: ",token.type,token.key)
             self.add_event(Evento("extrair_sintaxes", parser))
