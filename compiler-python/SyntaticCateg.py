@@ -26,6 +26,9 @@ class Parser():
         self.current_token = None
         self.current_token_id = 0
 
+        # current variable being assigned
+        self.current_variable = ""
+
         # global variable table
         self.variables = {}
 
@@ -36,8 +39,8 @@ class Parser():
         self.current_token = self.tokens[0]
 
     def extract_token(self):
+        self.current_token = self.tokens[self.current_token_id]
         self.current_token_id += 1
-        self.current_token = self.tokens[current_token_id]
 
     def recategorize_tokens(self):
         tokens2 = []
@@ -87,10 +90,13 @@ class Parser():
             if (self.automaton_state.id == 1):
                 self.automaton_state.id = 2
                 self.extract_token()
+            elif (self.automaton_state.id == 6):
+                self.variables[self.current_variable] = int(self.current_token.key)
+                self.extract_token()
         
         elif(self.current_token.type == "RESERVED"):
             if (self.current_token.key == "LET"):
-                pass
+                self.automaton_state.id = 4
             elif (self.current_token.key == "PRINT"):
                 pass
             elif (self.current_token.key == "DATA"):
@@ -113,7 +119,8 @@ class Parser():
                 pass
 
         elif(self.current_token.type == "COMPOSED"):
-            elif(self.current_token.key == "DEF FN"):
+            # register new function
+            if(self.current_token.key == "DEF FN "):
                 pass
         
         elif(self.current_token.type == "CHARACTER"):
@@ -126,7 +133,10 @@ class Parser():
             pass
         
         elif(self.current_token.type == "IDENTIFIER"):
-            pass
+            if (self.automaton_state.id == 4):
+                self.current_variable = self.current_token.key
+                self.extract_token() # =
+                self.automaton_state.id = 6 # calculate expression
         
         self.extract_token()
 
