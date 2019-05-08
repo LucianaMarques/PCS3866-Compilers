@@ -148,7 +148,18 @@ class Parser():
                 self.currant_variable = self.current_token.key
                 self.automaton_state.id = 5
             elif (self.automaton_state.id == 5):
+                # CALCULATE EXPRESSION HERE
                 self.automaton_state.id = 6
+                self.extract_token()
+                expression = []
+                while(self.current_token.type != 'EOL'):
+                    # print(self.current_token.type)
+                    expression.append(self.current_token)
+                    self.extract_token()
+                result = self.calculate_expression(expression)
+                variables_symbols[self.currant_variable] = result
+                print(variables_symbols[self.currant_variable])
+                self.automaton_state.id = 1
             elif (self.automaton_state.id == 11):
                 print("COMPILER ACTION")
                 if (self.current_token.key in variables_symbols):
@@ -156,36 +167,37 @@ class Parser():
                 else:
                     print(self.current_token.key)
             elif (self.automaton_state.id == 48):
+                self.currant_variable = self.current_token.key
                 self.automaton_state.id = 49
             elif (self.automaton_state.id == 49):
-                # Add the function's name to the function dictionary
-                functions[self.current_token.key] = ()
-                functions_stack.append(self.current_token.key)
                 self.automaton_state.id = 50
             elif (self.automaton_state.id == 50):
-                functions_stack.append(self.current_token.key)
+                functions[self.currant_variable] = (self.current_token.key,[])
                 self.automaton_state.id = 51
             elif (self.automaton_state.id == 51):
-                if self.automaton_state.id == 'INT':
-                    functions_stack.append(self.current_token.key)
-                    self.automaton_state.id = 51
-                else:
-                    # finish populating the functions map
-                    variable = ""
-                    i = 1
-                    while (i < len(functions_stack)):
-                        variable = variable + functions_stack[i]
-                    functions[functions_stack[0]] = (variable)
-                    self.automaton_state.id = 52
+                self.automaton_state.id = 52
             elif (self.automaton_state.id == 52):
-                self.automaton_state.id = 53
+                # print(self.currant_variable)
+                # self.automaton_state.id = 53
+                variable, expression = functions[self.currant_variable]
+                # print(variable)
+                while(self.current_token.type != 'EOL'):
+                    # print(self.current_token.type)
+                    expression.append(self.current_token)
+                    self.extract_token()
+                functions[self.currant_variable] = (variable,expression)
+                self.automaton_state.id = 1
             elif (self.automaton_state.id == 53):
-                variable = functions[functions_stack[0]][0]
-                if (self.current_token.key == "+" or self.current_token.key == "-"):
-                    functions[functions_stack[0]] = (variable,60)
+                # variable, expression = functions[self.currant_variable]
+                # while(self.current_token.type != 'EOL'):
+                #     expression.append(self.current_token)
+                #     self.next_state()
+                #     self.extract_token()
+                # functions[self.currant_variable] = (variable,expression)
+                # self.automaton_state.id = 1
+                if (self.current_token.key == '+' or self.current_token.key == '-'):
                     self.automaton_state.id = 54
                 else:
-                    functions[functions_stack[0]] = (variable,61)
                     self.automaton_state.id = 55
             elif (self.automaton_state.id == 54):
                 self.automaton_state.id = 53
@@ -216,4 +228,58 @@ class Parser():
         elif(self.current_token.type == "SNUM"):
             if (self.automaton_state.id == 6):# Cria a regra
                 pass
+    
+    def calculate_function_expression(variable_name,variable_value,tokens):
+        exp_stack = []
+        result = 0
+        for token in tokens:
+            if (token.key == variable_name):
+                if (len(exp_stack) == 0):
+                    result += variable_value
+                else:
+                    if (token.key == '^'):
+                        result = result**variable_value
+                    elif (token.key == '/'):
+                        result = result/variable_value
+            elif (token.type == 'CHARACTER'):
+                exp_stack.append(token.key)
+            elif (token.type == 'INT'):
+                if (len(exp_stack) == 0):
+                    result = token.key
+                else:
+                    if (token.key == '^'):
+                        result = result**token.key
+                    elif (token.key == '/'):
+                        result = result/token.key
+        return result
+
+    def calculate_expression(self,tokens):
+        print("hey3")
+        exp_stack = []
+        result = 0
+        for token in tokens:
+            print(token.key)
+            if (token.type == 'CHARACTER'):
+                exp_stack.append(token.key)
+                print("appended character expression")
+            elif (token.type == 'INT'):
+                if (len(exp_stack) == 0):
+                    print("added to the result")
+                    result = int(token.key)
+                else:
+                    exp = exp_stack.pop()
+                    if (exp == '^'):
+                        result = result**int(token.key)
+                    elif (exp == '/'):
+                        result = result/int(token.key)
+                    elif (exp == '*'):
+                        result = result*int(token.key)
+                    elif (exp == '+'):
+                        result = result+int(token.key)
+                    elif (exp == '-'):
+                        result = result-int(token.key)
+        return result
+
+    # def calculate_reserved_expression(variable_name,variable_value,tokens,type):
+
     
