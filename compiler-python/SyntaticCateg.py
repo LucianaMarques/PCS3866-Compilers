@@ -153,6 +153,7 @@ class Parser():
                 self.extract_token()
                 expression = []
                 while(self.current_token.type != 'EOL'):
+                    print("EXTRACTING EXPRESSION")
                     # print(self.current_token.type)
                     expression.append(self.current_token)
                     self.extract_token()
@@ -257,29 +258,45 @@ class Parser():
         print("hey3")
         exp_stack = []
         result = 0
-        for token in tokens:
-            print(token.key)
-            if (token.type == 'CHARACTER'):
-                exp_stack.append(token.key)
-                print("appended character expression")
-            elif (token.type == 'INT'):
+        i = 0
+        print(len(tokens))
+        while (i < len(tokens)):
+            if (tokens[i].type == 'CHARACTER'):
+                if (tokens[i].key == '('):
+                    partial_result = self.calculate_expression(tokens[i+1:])
+                    print(partial_result)
+                    if (len(exp_stack) == 0):
+                        result = partial_result
+                    elif (tokens[i].key == ')'):
+                        return result
+                    else:
+                        result = self.calculate_operation(exp_stack.pop(),result,partial_result)
+                elif (tokens[i].key == '*' or tokens[i].key == '^' or tokens[i].key == '+' or tokens[i].key == '/' or tokens[i].key == '-'):
+                    exp_stack.append(tokens[i].key)
+                    print("appended character expression")
+            elif (tokens[i].type == 'INT'):
                 if (len(exp_stack) == 0):
                     print("added to the result")
-                    result = int(token.key)
+                    result = int(tokens[i].key)
                 else:
                     exp = exp_stack.pop()
-                    if (exp == '^'):
-                        result = result**int(token.key)
-                    elif (exp == '/'):
-                        result = result/int(token.key)
-                    elif (exp == '*'):
-                        result = result*int(token.key)
-                    elif (exp == '+'):
-                        result = result+int(token.key)
-                    elif (exp == '-'):
-                        result = result-int(token.key)
+                    result = self.calculate_operation(exp,result,int(tokens[i].key))
+            i += 1
+        print("END OF EXPRESSION CALCULATION")
         return result
 
-    # def calculate_reserved_expression(variable_name,variable_value,tokens,type):
+    def calculate_operation(self,exp,result,partial_result):
+        if (exp == '^'):
+            result = result**partial_result
+        elif (exp == '/'):
+            result = result/partial_result
+        elif (exp == '*'):
+            result = result*partial_result
+        elif (exp == '+'):
+            result = result+partial_result
+        elif (exp == '-'):
+            result = result-partial_result
+        return result
+    # def calculate_reserved_expression(variable_name,varint(token.key)iable_value,tokens,type):
 
     
