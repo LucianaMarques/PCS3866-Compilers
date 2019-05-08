@@ -255,22 +255,31 @@ class Parser():
         return result
 
     def calculate_expression(self,tokens):
-        print("hey3")
         exp_stack = []
         result = 0
         i = 0
         print(len(tokens))
         while (i < len(tokens)):
+            print(tokens[i].key)
             if (tokens[i].type == 'CHARACTER'):
                 if (tokens[i].key == '('):
-                    partial_result = self.calculate_expression(tokens[i+1:])
+                    expression = []
+                    i += 1
+                    while (tokens[i].key != ')'):
+                        expression.append(tokens[i])
+                        i += 1
+                    expression.append(tokens[i])
+                    i += 1
+                    partial_result = self.calculate_expression(expression)
                     print(partial_result)
                     if (len(exp_stack) == 0):
                         result = partial_result
-                    elif (tokens[i].key == ')'):
-                        return result
+                    # elif (tokens[i].key == ')'):
+                    #     return result
                     else:
                         result = self.calculate_operation(exp_stack.pop(),result,partial_result)
+                elif (tokens[i].key == ')'):
+                    return result
                 elif (tokens[i].key == '*' or tokens[i].key == '^' or tokens[i].key == '+' or tokens[i].key == '/' or tokens[i].key == '-'):
                     exp_stack.append(tokens[i].key)
                     print("appended character expression")
@@ -281,6 +290,31 @@ class Parser():
                 else:
                     exp = exp_stack.pop()
                     result = self.calculate_operation(exp,result,int(tokens[i].key))
+            elif (tokens[i].type == 'RESERVED'):
+                if (tokens[i].key == 'EXP'):
+                    expression = []
+                    i += 1
+                    while (tokens[i].key != ")"):
+                        expression.append(tokens[i])
+                        i += 1
+                    expression.append(tokens[i])
+                    i += 1
+                    partial_result = math.exp(self.calculate_expression(expression))
+                    print(partial_result)
+                    if (len(exp_stack) == 0):
+                        result = partial_result
+                elif (tokens[i].key == 'SQR'):
+                    expression = []
+                    i += 1
+                    while (tokens[i].key != ')'):
+                        expression.append(tokens[i])
+                        i += 1
+                    expression.append(tokens[i])
+                    i += 1
+                    partial_result = math.sqrt(self.calculate_expression(expression))
+                    print(partial_result)
+                    if (len(exp_stack) == 0):
+                        result = partial_result
             i += 1
         print("END OF EXPRESSION CALCULATION")
         return result
