@@ -1,6 +1,12 @@
 import math
 from CodeGenerator import CodeGenerator
 
+# Dictionaries used
+functions = {}
+functions_stack = []
+variables_symbols = {}
+current_variable = []
+
 class SintaxAutomaton():
     def __init__(self):
         self.id = 1
@@ -85,10 +91,15 @@ class Parser():
             if (self.automaton_state.id == 1):
                 self.automaton_state.id = 2
             elif (self.automaton_state.id == 6):
+                print("hey")
+                # look for in the variable tables for the correspondent value
+                print(self.currant_variable)
+                variables_symbols[self.currant_variable] = int(self.current_token.key)
+                print(variables_symbols[self.currant_variable])
                 # skip state 7
-                self.automaton_state.id = 8
-                self.variables[self.current_variable] = int(self.current_token.key)
-                self.extract_token()
+                # self.automaton_state.id = 8
+                # variables_symbols[self.current_variable] = int(self.current_token.key)
+                # self.extract_token()
             elif(self.automaton_state.id == 54 or self.automaton_state.id == 53):
                 self.automaton_state.id = 55
         
@@ -134,28 +145,47 @@ class Parser():
         
         elif(self.current_token.type == "CHARACTER"):
             if (self.automaton_state.id == 4):
+                self.currant_variable = self.current_token.key
                 self.automaton_state.id = 5
             elif (self.automaton_state.id == 5):
                 self.automaton_state.id = 6
-            elif (self.automaton_state.id == 6):
-                # look for in the variable tables for the correspondent value
-                self.variables[self.current_variable] = self.variables[self.current_token.id]
-                self.extract_token()
+            elif (self.automaton_state.id == 11):
+                print("COMPILER ACTION")
+                if (self.current_token.key in variables_symbols):
+                    print(variables_symbols[self.current_token.key])
+                else:
+                    print(self.current_token.key)
             elif (self.automaton_state.id == 48):
                 self.automaton_state.id = 49
             elif (self.automaton_state.id == 49):
+                # Add the function's name to the function dictionary
+                functions[self.current_token.key] = ()
+                functions_stack.append(self.current_token.key)
                 self.automaton_state.id = 50
             elif (self.automaton_state.id == 50):
+                functions_stack.append(self.current_token.key)
                 self.automaton_state.id = 51
             elif (self.automaton_state.id == 51):
-                # CHECK IF DIGIT!!!!!!!!!!!!!!
-                self.automaton_state.id = 52
+                if self.automaton_state.id == 'INT':
+                    functions_stack.append(self.current_token.key)
+                    self.automaton_state.id = 51
+                else:
+                    # finish populating the functions map
+                    variable = ""
+                    i = 1
+                    while (i < len(functions_stack)):
+                        variable = variable + functions_stack[i]
+                    functions[functions_stack[0]] = (variable)
+                    self.automaton_state.id = 52
             elif (self.automaton_state.id == 52):
                 self.automaton_state.id = 53
             elif (self.automaton_state.id == 53):
+                variable = functions[functions_stack[0]][0]
                 if (self.current_token.key == "+" or self.current_token.key == "-"):
+                    functions[functions_stack[0]] = (variable,60)
                     self.automaton_state.id = 54
                 else:
+                    functions[functions_stack[0]] = (variable,61)
                     self.automaton_state.id = 55
             elif (self.automaton_state.id == 54):
                 self.automaton_state.id = 53
@@ -174,25 +204,16 @@ class Parser():
 
         elif(self.current_token.type == "NUM"):
             if (self.automaton_state.id == 6):
-                self.variables[self.current_variable] = float(self.current_token.key)
-                self.extract_token()
-            if (self.automaton_state.id == 54):
+                self.automaton_state.id = 8
+            elif (self.automaton_state.id == 7):
+                if (self.currant_variable is not None):
+                    variables_symbols[self.currant_variable] = self.current_token.key
+                    current_variable = None
+                    self.automaton_state.id = 8
+            elif (self.automaton_state.id == 54):
                 self.automaton_state.id = 55
 
         elif(self.current_token.type == "SNUM"):
-            if (self.automaton_state.id == 6):
-                self.variables[self.current_variable] = float(self.current_token.key)
-                self.extract_token()
-        
-        elif(self.current_token.type == "IDENTIFIER"):
-            if (self.automaton_state.id == 4):
-                self.current_variable = self.current_token.key
-                self.variables[self.current_token.key] = None
-                self.extract_token() # skip =
-                self.automaton_state.id = 6 # calculate expression
-            elif (self.automaton_state.id == 8):
-                # print identifier's number
-                # print(self.variables[self.current_token.key])
+            if (self.automaton_state.id == 6):# Cria a regra
                 pass
-            elif (self.automaton_state.id == 54):
-                self.automaton_state.id = 55
+    
