@@ -130,7 +130,12 @@ class Parser():
             elif (self.current_token.key == "END"):
                 self.automaton_state.id = 3
             elif (self.current_token.key == "READ"):
-                self.automaton_state.id = 19
+                print("READING VARIABLE")
+                value = int(input("Type the value: "))
+                variables_symbols[self.currant_variable] = value
+                print(variables_symbols[self.currant_variable])
+                # self.automaton_state.id = 19
+                self.automaton_state.id = 1
             elif (self.current_token.key == "FN" or self.current_token.key == "FN "):
                 self.automaton_state.id = 56
             
@@ -148,19 +153,28 @@ class Parser():
                 self.currant_variable = self.current_token.key
                 self.automaton_state.id = 5
             elif (self.automaton_state.id == 5):
-                # CALCULATE EXPRESSION HERE
-                self.automaton_state.id = 6
                 self.extract_token()
-                expression = []
-                while(self.current_token.type != 'EOL'):
-                    print("EXTRACTING EXPRESSION")
-                    # print(self.current_token.type)
-                    expression.append(self.current_token)
+                if (self.current_token.key == "READ"):
+                    print("READING VARIABLE")
+                    value = int(input("Type the value: "))
+                    variables_symbols[self.currant_variable] = value
+                    print(variables_symbols[self.currant_variable])
+                    # self.automaton_state.id = 19
+                    self.automaton_state.id = 1
+                elif (self.current_token.key != "READ"):
+                    # CALCULATE EXPRESSION HERE
+                    self.automaton_state.id = 6
                     self.extract_token()
-                result = self.calculate_expression(expression)
-                variables_symbols[self.currant_variable] = result
-                print(variables_symbols[self.currant_variable])
-                self.automaton_state.id = 1
+                    expression = []
+                    while(self.current_token.type != 'EOL'):
+                        print("EXTRACTING EXPRESSION")
+                        # print(self.current_token.type)
+                        expression.append(self.current_token)
+                        self.extract_token()
+                    result = self.calculate_expression(expression)
+                    variables_symbols[self.currant_variable] = result
+                    print(variables_symbols[self.currant_variable])
+                    self.automaton_state.id = 1
             elif (self.automaton_state.id == 11):
                 print("COMPILER ACTION")
                 if (self.current_token.key in variables_symbols):
@@ -168,6 +182,7 @@ class Parser():
                 else:
                     print(self.current_token.key)
             elif (self.automaton_state.id == 48):
+                # function name
                 self.currant_variable = self.current_token.key
                 self.automaton_state.id = 49
             elif (self.automaton_state.id == 49):
@@ -187,6 +202,7 @@ class Parser():
                     expression.append(self.current_token)
                     self.extract_token()
                 functions[self.currant_variable] = (variable,expression)
+                print("FUNCTION ", self.currant_variable, " DEFINED")
                 self.automaton_state.id = 1
             elif (self.automaton_state.id == 53):
                 # variable, expression = functions[self.currant_variable]
@@ -230,28 +246,53 @@ class Parser():
             if (self.automaton_state.id == 6):# Cria a regra
                 pass
     
-    def calculate_function_expression(variable_name,variable_value,tokens):
+    def calculate_function_expression(self,variable_name,variable_value,tokens):
+        print("EVALUATING FUNCTION EXPRESSION")
+        print(len(tokens))
         exp_stack = []
         result = 0
-        for token in tokens:
-            if (token.key == variable_name):
+        i = 0
+        while (i < len(tokens)):
+            print("i: ", i)
+            print(tokens[i].key)
+            if (tokens[i].key == variable_name):
                 if (len(exp_stack) == 0):
                     result += variable_value
                 else:
-                    if (token.key == '^'):
-                        result = result**variable_value
-                    elif (token.key == '/'):
-                        result = result/variable_value
-            elif (token.type == 'CHARACTER'):
-                exp_stack.append(token.key)
-            elif (token.type == 'INT'):
+                    result = self.calculate_operation(exp_stack.pop(),result,partial_result)
+            elif (tokens[i].type == 'INT'):
                 if (len(exp_stack) == 0):
-                    result = token.key
+                    result += variable_value
                 else:
-                    if (token.key == '^'):
-                        result = result**token.key
-                    elif (token.key == '/'):
-                        result = result/token.key
+                    result = self.calculate_operation(exp_stack.pop(),result,partial_result)
+            elif (tokens[i].type == 'CHARACTER'):
+                print("hey")
+                if (tokens[i].key == '('):
+                    print("FOUND NEW EXPRESSION")
+                    expression = []
+                    i += 1
+                    while (tokens[i].key != ')'):
+                        if (tokens[i].key == variable_name):
+                            tokens[i].key = variable_value
+                            tokens[i].type = 'INT'
+                        expression.append(tokens[i])
+                        i += 1
+                    expression.append(tokens[i])
+                    i += 1
+                    partial_result = self.calculate_expression(expression)
+                    print("Partial result: ", partial_result)
+                    if (len(exp_stack) == 0):
+                        result = partial_result
+                    else:
+                        result = self.calculate_operation(exp_stack.pop(),result,partial_result)
+                elif (tokens[i].key == ')'):
+                    return result
+                elif (tokens[i].key == '*' or tokens[i].key == '^' or tokens[i].key == '+' or tokens[i].key == '/' or tokens[i].key == '-'):
+                    exp_stack.append(tokens[i].key)
+                    print("appended character expression")
+            i = i + 1
+        print("Result: ",result)
+        print("END OF FUNCTION EVALUATION")
         return result
 
     def calculate_expression(self,tokens):
@@ -263,6 +304,7 @@ class Parser():
             print(tokens[i].key)
             if (tokens[i].type == 'CHARACTER'):
                 if (tokens[i].key == '('):
+                    print("FOUND NEW EXPRESSION")
                     expression = []
                     i += 1
                     while (tokens[i].key != ')'):
@@ -274,8 +316,6 @@ class Parser():
                     print(partial_result)
                     if (len(exp_stack) == 0):
                         result = partial_result
-                    # elif (tokens[i].key == ')'):
-                    #     return result
                     else:
                         result = self.calculate_operation(exp_stack.pop(),result,partial_result)
                 elif (tokens[i].key == ')'):
@@ -312,6 +352,80 @@ class Parser():
                     expression.append(tokens[i])
                     i += 1
                     partial_result = math.sqrt(self.calculate_expression(expression))
+                    print(partial_result)
+                    if (len(exp_stack) == 0):
+                        result = partial_result
+                elif (tokens[i].key == 'SIN'):
+                    expression = []
+                    i += 1
+                    while (tokens[i].key != ')'):
+                        expression.append(tokens[i])
+                        i += 1
+                    expression.append(tokens[i])
+                    i += 1
+                    partial_result = math.sin(self.calculate_expression(expression))
+                    print(partial_result)
+                    if (len(exp_stack) == 0):
+                        result = partial_result
+                elif (tokens[i].key == 'COS'):
+                    expression = []
+                    i += 1
+                    while (tokens[i].key != ')'):
+                        expression.append(tokens[i])
+                        i += 1
+                    expression.append(tokens[i])
+                    i += 1
+                    partial_result = math.cos(self.calculate_expression(expression))
+                    print(partial_result)
+                    if (len(exp_stack) == 0):
+                        result = partial_result
+                elif (tokens[i].key == 'TAN'):
+                    expression = []
+                    i += 1
+                    while (tokens[i].key != ')'):
+                        expression.append(tokens[i])
+                        i += 1
+                    expression.append(tokens[i])
+                    i += 1
+                    partial_result = math.tan(self.calculate_expression(expression))
+                    print(partial_result)
+                    if (len(exp_stack) == 0):
+                        result = partial_result
+                elif (tokens[i].key == 'ABS'):
+                    expression = []
+                    i += 1
+                    while (tokens[i].key != ')'):
+                        expression.append(tokens[i])
+                        i += 1
+                    expression.append(tokens[i])
+                    i += 1
+                    partial_result = abs(self.calculate_expression(expression))
+                    print(partial_result)
+                    if (len(exp_stack) == 0):
+                        result = partial_result
+                elif (tokens[i].key == 'LOG'):
+                    expression = []
+                    i += 1
+                    while (tokens[i].key != ')'):
+                        expression.append(tokens[i])
+                        i += 1
+                    expression.append(tokens[i])
+                    i += 1
+                    partial_result = math.log(self.calculate_expression(expression))
+                    print(partial_result)
+                    if (len(exp_stack) == 0):
+                        result = partial_result
+                elif (tokens[i].key == 'FN'):
+                    i += 1
+                    function_name = tokens[i].key
+                    variable,expression = functions[function_name]
+                    i += 2
+                    variable_value = 0
+                    if (tokens[i].type == 'INT'):
+                        variable_value = int(tokens[i].key)
+                    else:
+                        variable_value = variables_symbols[tokens[i].key]
+                    partial_result = self.calculate_function_expression(variable,variable_value,expression)
                     print(partial_result)
                     if (len(exp_stack) == 0):
                         result = partial_result
