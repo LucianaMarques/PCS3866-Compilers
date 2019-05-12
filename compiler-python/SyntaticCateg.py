@@ -95,7 +95,7 @@ class Parser():
                 # look for in the variable tables for the correspondent value
                 print(self.currant_variable)
                 variables_symbols[self.currant_variable] = int(self.current_token.key)
-                print(variables_symbols[self.currant_variable])
+                #print(variables_symbols[self.currant_variable])
                 # skip state 7
                 # self.automaton_state.id = 8
                 # variables_symbols[self.current_variable] = int(self.current_token.key)
@@ -130,11 +130,12 @@ class Parser():
             elif (self.current_token.key == "END"):
                 self.automaton_state.id = 3
             elif (self.current_token.key == "READ"):
+                self.extract_token()
                 print("READING VARIABLE")
+                self.currant_variable = self.current_token.key
                 value = int(input("Type the value: "))
                 variables_symbols[self.currant_variable] = value
                 print(variables_symbols[self.currant_variable])
-                # self.automaton_state.id = 19
                 self.automaton_state.id = 1
             elif (self.current_token.key == "FN" or self.current_token.key == "FN "):
                 self.automaton_state.id = 56
@@ -154,27 +155,18 @@ class Parser():
                 self.automaton_state.id = 5
             elif (self.automaton_state.id == 5):
                 self.extract_token()
-                if (self.current_token.key == "READ"):
-                    print("READING VARIABLE")
-                    value = int(input("Type the value: "))
-                    variables_symbols[self.currant_variable] = value
-                    print(variables_symbols[self.currant_variable])
-                    # self.automaton_state.id = 19
-                    self.automaton_state.id = 1
-                elif (self.current_token.key != "READ"):
-                    # CALCULATE EXPRESSION HERE
-                    self.automaton_state.id = 6
+                self.automaton_state.id = 6
+                self.extract_token()
+                expression = []
+                while(self.current_token.type != 'EOL'):
+                    print("EXTRACTING EXPRESSION")
+                    # print(self.current_token.type)
+                    expression.append(self.current_token)
                     self.extract_token()
-                    expression = []
-                    while(self.current_token.type != 'EOL'):
-                        print("EXTRACTING EXPRESSION")
-                        # print(self.current_token.type)
-                        expression.append(self.current_token)
-                        self.extract_token()
-                    result = self.calculate_expression(expression)
-                    variables_symbols[self.currant_variable] = result
-                    print(variables_symbols[self.currant_variable])
-                    self.automaton_state.id = 1
+                result = self.calculate_expression(expression)
+                variables_symbols[self.currant_variable] = result
+                #print(variables_symbols[self.currant_variable])
+                self.automaton_state.id = 1
             elif (self.automaton_state.id == 11):
                 print("COMPILER ACTION")
                 if (self.current_token.key in variables_symbols):
