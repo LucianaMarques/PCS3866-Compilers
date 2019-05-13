@@ -287,6 +287,7 @@ class LexerCategorizer:
       
     # Check for RESERVED type token
     def check_reserved(self, i):
+        print("CHECKING IF RESERVED")
         #“ABS” | “ATN” 
         if (self.characters[i].char == 'A'):
             if (self.characters[i+1].char == 'B'):
@@ -312,9 +313,7 @@ class LexerCategorizer:
                 return False, ''
         # “END” |“EXP”
         elif (self.characters[i].char == 'E'):
-            print("hey")
             if (self.characters[i+1].char == 'N'):
-                print("hey2")
                 return True, 'ND'
             elif (self.characters[i+1].char == 'X'):
                 return True, 'XP'
@@ -356,7 +355,8 @@ class LexerCategorizer:
                 return False, ''
         # "NEXT"
         elif (self.characters[i].char == 'N'):
-            if (self.characters[i+1] == 'E'):
+            print("hey, found an N")
+            if (self.characters[i+1].char == 'E'):
                 return True, 'EXT'
             else:
                 return False, ''
@@ -368,7 +368,6 @@ class LexerCategorizer:
                 return False, ''
         # “READ” |“REM” | “RETURN” | “RND”
         elif (self.characters[i].char == 'R'):
-            print("hey")
             if (self.characters[i+1].char == 'N'):
                 return True, 'ND'
             elif (self.characters[i+2].char == 'A'):
