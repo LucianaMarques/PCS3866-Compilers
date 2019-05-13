@@ -65,6 +65,7 @@ class Parser():
                 tokens2.append(Token(self.tokens[i+2].type, self.tokens[i+2].key))
                 i += 2
             elif (self.tokens[i].key == ">"):
+                    # print(partial_result)
                 tokens2.append(Token('COMPOSED', '>='))
                 i += 1
             else:
@@ -94,15 +95,7 @@ class Parser():
             if (self.automaton_state.id == 1):
                 self.automaton_state.id = 2
             elif (self.automaton_state.id == 6):
-                # print("hey")
-                # look for in the variable tables for the correspondent value
-                # print(self.currant_variable)
                 variables_symbols[self.currant_variable] = int(self.current_token.key)
-                #print(variables_symbols[self.currant_variable])
-                # skip state 7
-                # self.automaton_state.id = 8
-                # variables_symbols[self.current_variable] = int(self.current_token.key)
-                # self.extract_token()print
             elif(self.automaton_state.id == 54 or self.automaton_state.id == 53):
                 self.automaton_state.id = 55
         
@@ -119,7 +112,27 @@ class Parser():
                 self.automaton_state.id = 23
                 self.extract_token() # skip "TO"
             elif (self.current_token.key == "IF"):
-                self.automaton_state.id = 25
+                self.extract_token()
+                value = variables_symbols[self.current_token.key]
+                self.extract_token()
+                operator = self.current_token.key
+                self.extract_token()
+                expression = []
+                result = 0
+                while(self.current_token.key != 'THEN'):
+                    expression.append(self.current_token)
+                    self.extract_token()
+                self.extract_token()
+                destination = self.current_token.key
+                result = int(self.calculate_expression(expression))
+                if ((operator == '=' and value == result) or (operator == '>' and value > result) or (operator == '<' and value < result)):
+                    self.current_token_id -= 2
+                    while(self.tokens[self.current_token_id].key != destination):
+                        self.current_token_id -= 1
+                    print("hey there")
+                    print(self.current_token_id)
+                    self.automaton_state.id = 1
+
             elif (self.current_token.key == "FOR"):
                 print("BEGINING OF A FOR LOOP")
                 self.extract_token()
@@ -133,7 +146,6 @@ class Parser():
                 self.for_variables[self.currant_variable] = (current_state,final_state,self.current_token_id)
                 self.variables[self.currant_variable] = current_state
                 self.last_for_loops.append(self.currant_variable)
-                # self.automaton_state.id = 32
                 self.automaton_state.id = 1
                 print("CURRENT STATE: ",self.currant_variable, " = ", current_state)
                 print("FINAL STATE  : ",self.currant_variable, " = ", final_state)
@@ -151,7 +163,6 @@ class Parser():
                     self.current_token_id = destination_id
                     self.for_variables[self.current_token.key] = (init,final,destination_id)
                 self.variables[self.current_token.key] = init
-                # self.automaton_state.id = 41
             elif (self.current_token.key == "DIM"):
                 self.automaton_state.id = 43
             elif (self.current_token.key == "GOSUB"):
@@ -184,7 +195,6 @@ class Parser():
         
         elif(self.current_token.type == "CHARACTER"):
             if (self.automaton_state.id == 4):
-                # print(self.current_token.type)
                 self.currant_variable = self.current_token.key
                 self.automaton_state.id = 5
             elif (self.automaton_state.id == 5):
@@ -194,12 +204,10 @@ class Parser():
                 expression = []
                 print("EXTRACTING EXPRESSION")
                 while(self.current_token.type != 'EOL'):
-                    # print(self.current_token.type)
                     expression.append(self.current_token)
                     self.extract_token()
                 result = self.calculate_expression(expression)
                 variables_symbols[self.currant_variable] = result
-                #print(variables_symbols[self.currant_variable])
                 self.automaton_state.id = 1
             elif (self.automaton_state.id == 11):
                 print("COMPILER ACTION")
@@ -219,25 +227,14 @@ class Parser():
             elif (self.automaton_state.id == 51):
                 self.automaton_state.id = 52
             elif (self.automaton_state.id == 52):
-                # print(self.currant_variable)
-                # self.automaton_state.id = 53
                 variable, expression = functions[self.currant_variable]
-                # print(variable)
                 while(self.current_token.type != 'EOL'):
-                    # print(self.current_token.type)
                     expression.append(self.current_token)
                     self.extract_token()
                 functions[self.currant_variable] = (variable,expression)
                 print("FUNCTION ", self.currant_variable, " DEFINED")
                 self.automaton_state.id = 1
             elif (self.automaton_state.id == 53):
-                # variable, expression = functions[self.currant_variable]
-                # while(self.current_token.type != 'EOL'):
-                #     expression.append(self.current_token)
-                #     self.next_state()
-                #     self.extract_token()
-                # functions[self.currant_variable] = (variable,expression)
-                # self.automaton_state.id = 1
                 if (self.current_token.key == '+' or self.current_token.key == '-'):
                     self.automaton_state.id = 54
                 else:
@@ -275,13 +272,10 @@ class Parser():
     def calculate_function_expression(self,variable_name,variable_value,tokens):
         print("EVALUATING FUNCTION EXPRESSION")
         print("VARIABLE VALUE ",variable_value)
-        # print(len(tokens))
         exp_stack = []
         result = 0
         i = 0
         while (i < len(tokens)):
-            # print("i: ", i)
-            # print(tokens[i].key)
             if (tokens[i].key == variable_name):
                 if (len(exp_stack) == 0):
                     result += variable_value
@@ -327,7 +321,6 @@ class Parser():
         exp_stack = []
         result = 0
         i = 0
-        # print(len(tokens))
         while (i < len(tokens)):
             print("CURRENT EXPRESSION TOKEN: ",tokens[i].key)
             if (tokens[i].type == 'CHARACTER'):
@@ -341,7 +334,6 @@ class Parser():
                     expression.append(tokens[i])
                     i += 1
                     partial_result = self.calculate_expression(expression)
-                    # print(partial_result)
                     if (len(exp_stack) == 0):
                         result = partial_result
                     else:
@@ -353,7 +345,6 @@ class Parser():
                     print("appended character expression")
             elif (tokens[i].type == 'INT'):
                 if (len(exp_stack) == 0):
-                    # print("added to the result")
                     result = int(tokens[i].key)
                 else:
                     exp = exp_stack.pop()
@@ -368,7 +359,6 @@ class Parser():
                     expression.append(tokens[i])
                     i += 1
                     partial_result = math.exp(self.calculate_expression(expression))
-                    # print(partial_result)
                     if (len(exp_stack) == 0):
                         result = partial_result
                 elif (tokens[i].key == 'SQR'):
@@ -380,7 +370,6 @@ class Parser():
                     expression.append(tokens[i])
                     i += 1
                     partial_result = math.sqrt(self.calculate_expression(expression))
-                    # print(partial_result)
                     if (len(exp_stack) == 0):
                         result = partial_result
                 elif (tokens[i].key == 'SIN'):
@@ -392,7 +381,6 @@ class Parser():
                     expression.append(tokens[i])
                     i += 1
                     partial_result = math.sin(self.calculate_expression(expression))
-                    # print(partial_result)
                     if (len(exp_stack) == 0):
                         result = partial_result
                 elif (tokens[i].key == 'COS'):
@@ -404,7 +392,6 @@ class Parser():
                     expression.append(tokens[i])
                     i += 1
                     partial_result = math.cos(self.calculate_expression(expression))
-                    # print(partial_result)
                     if (len(exp_stack) == 0):
                         result = partial_result
                 elif (tokens[i].key == 'TAN'):
@@ -416,7 +403,6 @@ class Parser():
                     expression.append(tokens[i])
                     i += 1
                     partial_result = math.tan(self.calculate_expression(expression))
-                    # print(partial_result)
                     if (len(exp_stack) == 0):
                         result = partial_result
                 elif (tokens[i].key == 'ABS'):
@@ -428,7 +414,6 @@ class Parser():
                     expression.append(tokens[i])
                     i += 1
                     partial_result = abs(self.calculate_expression(expression))
-                    # print(partial_result)
                     if (len(exp_stack) == 0):
                         result = partial_result
                 elif (tokens[i].key == 'LOG'):
@@ -440,7 +425,6 @@ class Parser():
                     expression.append(tokens[i])
                     i += 1
                     partial_result = math.log(self.calculate_expression(expression))
-                    # print(partial_result)
                     if (len(exp_stack) == 0):
                         result = partial_result
                 elif (tokens[i].key == 'FN'):
@@ -457,7 +441,6 @@ class Parser():
                         variable_value = self.variables[variable]
                         print("FOUND VARIABLE ",variable, " ",variable_value)
                     partial_result = self.calculate_function_expression(variable,variable_value,expression)
-                    # print(partial_result)
                     if (len(exp_stack) == 0):
                         result = partial_result
             i += 1
