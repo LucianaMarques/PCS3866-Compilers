@@ -1,13 +1,9 @@
 from queue import Queue
 from LexerCateg import AsciiCharacter, LexerCategorizer, AutomatonState
 from SyntaticCateg import Token, Parser
-#from CodeGenerator import CodeGenerator
 
 # Parser
 parser = Parser()
-
-# Code Genegerator
-#codeGen = CodeGenerator()
 
 class Evento():
     def __init__(self, t, v):
@@ -68,7 +64,6 @@ class MotorDeEventos():
             print("CLASSIFICAÇÃO LÉXICA")
             for char in self.characters:
                 char.classify_ascii_char()
-                #print(char.char," ",char.type)
             self.add_event(Evento("extrair_tokens", self.tokens))
 
         elif (e.type == "extrair_tokens"):
@@ -78,28 +73,23 @@ class MotorDeEventos():
             lexCateg = LexerCategorizer(self.characters,automatonState)
             lexCateg.categorize()
             tokens2 = lexCateg.tokens
-            # for token in tokens2:
-            #     print(token.type)
             self.add_event(Evento("recategorizar_tokens", tokens2))
         
         elif (e.type == "recategorizar_tokens"):
             print("RECATEGORIZAR TOKENS")
             parser.tokens = e.value
             parser.recategorize_tokens()
-            # parser.initialize_tokens()
             for token in parser.tokens:
                 print("Token: ",token.type,token.key)
             self.add_event(Evento("extrair_sintaxes", parser))
         
         elif (e.type == "extrair_sintaxes"):
             print("EXTRAÇÃO DE SINTAXES")
-            #parser.syntax_categorize()
             parser.syntax_extraction()
             self.add_event(Evento("geracao_codigo", parser.sintaxes))
         
         elif (e.type == "geracao_codigo"):
             print("CODIGO GERADO")
-            # parser.generate_code()
             self.add_event(Evento("fim", ""))
         
         elif (e.type == "fim"):

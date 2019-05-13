@@ -129,8 +129,6 @@ class Parser():
                     self.current_token_id -= 2
                     while(self.tokens[self.current_token_id].key != destination):
                         self.current_token_id -= 1
-                    print("hey there")
-                    print(self.current_token_id)
                     self.automaton_state.id = 1
 
             elif (self.current_token.key == "FOR"):
